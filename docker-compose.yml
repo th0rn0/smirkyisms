@@ -1,0 +1,10 @@
+version: "3.4"
+services:
+  
+  # Mongo DB
+  mongo:
+    image: mongo:3.6.2-jessie
+    volumes:
+      - ./database:/data/db
+    ports:
+      - "27017:27017"

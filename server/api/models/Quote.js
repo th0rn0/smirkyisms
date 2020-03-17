@@ -6,8 +6,10 @@
  */
 
 module.exports = {
-
+  tableName: 'quotes',
+  datastore: 'default',
   attributes: {
+    text: { type: 'string', required: true }
 
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
