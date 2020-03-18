@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="home">
     <img alt="Vue logo" src="../assets/logo.png">
-    <Quote msg="Welcome to Smirkyisms"/>
+    <Quote quote="Welcome to Smirkyisms"/>
     {{ info }}
   </div>
 </template>
