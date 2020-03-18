@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="home">
+  <div class="home">
     <img alt="Vue logo" src="../assets/logo.png">
     <Quote quote="Welcome to Smirkyisms"/>
     {{ info }}
@@ -16,7 +16,6 @@ export default {
   components: {
     Quote
   },
-	el: '#app',
   data () {
     return {
       info: null
