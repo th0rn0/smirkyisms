@@ -1,6 +1,6 @@
 <template>
-  <div class="quote">
-    <h1>{{ quote }}</h1>
+  <div class="page-header">
+    <h1>{{ header }}</h1>
   </div>
 </template>
 
@@ -8,7 +8,7 @@
 export default {
   name: 'Quote',
   props: {
-    quote: String
+    header: String
   }
 }
 </script>
