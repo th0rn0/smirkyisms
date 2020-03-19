@@ -1,12 +1,30 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/quotes">Quotes</router-link>
+      <router-link to="/">Random</router-link> |
+      <router-link to="/quotes">Quotes</router-link> |
+      <a href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddQuote">Add Quote</a>
     </div>
     <router-view/>
+    <QuoteModal />
   </div>
 </template>
+
+<script>
+
+import QuoteModal from '@/components/QuoteModal.vue'
+
+export default {
+  components: {
+    QuoteModal
+  },
+  data() {
+    return {
+      quote: null
+    }
+  }
+}
+</script>
 
 <style>
 #app {
