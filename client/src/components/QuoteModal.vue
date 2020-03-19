@@ -59,12 +59,10 @@ export default {
           text: this.quote
         })
         .then(response => {
-          console.log('thisisaresposne');
           console.log(response);
           currentObj.output = response.data;
         })
         .catch(e => {
-          console.log('thisisaerror');
           console.error(e);
         });
     }
