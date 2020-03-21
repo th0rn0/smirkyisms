@@ -5,7 +5,7 @@ const client = new Discord.Client();
 const axios = require('axios').default;
 
 // Settings
-const voteTime = 30000;
+const voteTime = 10000;
 const botToken = process.env.TOKEN;
 
 // Commands
@@ -27,6 +27,7 @@ client.on('message', message => {
 	if (message.content.toLowerCase().startsWith(commandQuote)) {
 		var callMessage = message.content.split(commandQuote + ' ')[1];
 		console.log(callMessage);
+		const provokeMessage = message;
 		message.channel.messages.fetch(callMessage).then( message => {
 			message.channel.send('Fair Sik... Starting a 30 second Vote...');
 
@@ -47,16 +48,16 @@ client.on('message', message => {
 				collected.each(message => {
 					switch (message._emoji.name) {
 						case '👍':
-							upvote++;
+							upvote = message.count;
 							break;
 						case '👎':
-							downvote++;
+							downvote = message.count;
 							break;
 					}
 				});
 				if (upvote > downvote) {
 					message.channel.send('Vote was successful. Uploading to Smirkisms.com...');
-					uploadQuote(message);
+					uploadQuote(message, provokeMessage);
 				} else {
 					message.channel.send('Vote was unsuccessful. Quote something better!');
 				}
@@ -69,10 +70,13 @@ client.on('message', message => {
 	}
 });
 
-async function uploadQuote(message) {
-	console.log(message.cleanContent);
+async function uploadQuote(message, provokeMessage) {
+	console.log('message');
+	console.log(provokeMessage);
 	axios.post('http://localhost:1337/quote', {
-		text: message.cleanContent
+		text: message.cleanContent,
+		quote_by_discord_id: message.author.id,
+		quoted_by_discord_id: provokeMessage.author.id 
 	}).then(function (response) {
 		console.log(response);
 		message.channel.send('Upload successful!');
