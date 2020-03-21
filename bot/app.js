@@ -1,10 +1,19 @@
+// Dependencies
 require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const axios = require('axios').default;
 
-const TOKEN = process.env.TOKEN;
+// Settings
+const voteTime = 30000;
+const botToken = process.env.TOKEN;
 
-client.login(TOKEN);
+// Commands
+const commandId = '.';
+const commandQuote = commandId + 'smirketpin';
+
+// Bot
+client.login(botToken);
 
 client.on('ready', () => {
   console.info(`Logged in as ${client.user.tag}!`);
@@ -14,75 +23,62 @@ client.on('ready', () => {
 
 client.on('message', message => {
 	if (message.author.bot) return;
-	if (message.content.startsWith('SMIRKET PIN!')) {
-		message.channel.send('Fair Sik...');
-		return;
-	}
-	if (message.content.toLowerCase().indexOf('smirket pin') != -1) {
-		console.log(message.cleanContent);
 
+	if (message.content.toLowerCase().startsWith(commandQuote)) {
+		var callMessage = message.content.split(commandQuote + ' ')[1];
+		console.log(callMessage);
+		message.channel.messages.fetch(callMessage).then( message => {
+			message.channel.send('Fair Sik... Starting a 30 second Vote...');
 
-		message.channel.messages.fetch('690748280728059945')
-		.then( message => {
 			message.react('👍').then(() => message.react('👎'));
 
 			const filter = (reaction, user) => {
-				return ['👍', '👎'].includes(reaction.emoji.name) && user.id === message.author.id;
+				return ['👍', '👎'].includes(reaction.emoji.name);
 			};
 
-			const upvote = 0;
-			
+			const collector = message.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
 
-			const collector = message.createReactionCollector(filter, { max: 3, time: 10000, errors: ['time'] })
 			collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
-			collector.on('end', collected => console.log(`Collected ${collected.size} items`));
 
+			collector.on('end', collected => {
+				console.log(`Collected ${collected} items`)
+				let upvote = 0;
+				let downvote = 0;
+				collected.each(message => {
+					switch (message._emoji.name) {
+						case '👍':
+							upvote++;
+							break;
+						case '👎':
+							downvote++;
+							break;
+					}
+				});
+				if (upvote > downvote) {
+					message.channel.send('Vote was successful. Uploading to Smirkisms.com...');
+					uploadQuote(message);
+				} else {
+					message.channel.send('Vote was unsuccessful. Quote something better!');
+				}
+			});
 
-		// 	message.awaitReactions(filter, { max: 1, time: 10000, errors: ['time'] })
-		// 		.then(collected => {
-		// 			const reaction = collected.first();
-
-		// 			if (reaction.emoji.name === '👍') {
-		// 				message.reply('you reacted with a thumbs up.');
-		// 			} else {
-		// 				message.reply('you reacted with a thumbs down.');
-		// 			}
-		// 			console.log(`Collected ${collected.size} reactions`);
-		// 		})
-		// 		.catch(collected => {
-		// 			message.reply('you reacted with neither a thumbs up, nor a thumbs down.');
-		// 		})
-		// 		// console.log(message);
-		// 		// console.log('asdasd');
-		// 		// message.awaitReactions({ time: 60 })
-		// 		// .then(collected => {
-		// 		// 	console.log(collected)
-		// 		// });
+		}).catch(function (error) {
+			message.channel.send('Message ID Not Recognized. Try Again');
 		});
-	 	// console.log(message.channel.messages.fetch('690640627532169336'));
-		message.channel.send('Fair Sik...');
 		return;
 	}
 });
 
-async function getMessages(channel, limit = 100) {
-	const messageCount =[];
-  let lastId;
-	client.user.setActivity('Searching in ' + channel.name + '!');
- 	while (true) {
-    const options = { limit: 1 };
-    if (lastId) {
-      options.before = lastId;
-    }
-    const messages = await channel.fetchMessage(690635718023708729);
-    messages.forEach((message) => {
-    	console.log(message.reactions)
-    });
-  }
+async function uploadQuote(message) {
+	console.log(message.cleanContent);
+	axios.post('http://localhost:1337/quote', {
+		text: message.cleanContent
+	}).then(function (response) {
+		console.log(response);
+		message.channel.send('Upload successful!');
+	})
+	.catch(function (error) {
+		console.log(error);
+		message.channel.send('There was a error! ' + error);
+	})
 }
-
-
-async function getMessage(channel, id) {
-	const message = await channel.messages.fetch('690640627532169336');
-	return message
-}	
