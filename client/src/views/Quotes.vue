@@ -2,7 +2,7 @@
   <div class="quotes">
     <img width="20%" alt="Vue logo" src="../assets/smirkyisms.jpg">
 		<PageHeader header="Quotes"/>
-		<Quote v-for="quote in quotes" v-bind:key="quote.id" v-bind:quote="quote.text" />
+    <Quote v-for="quote in quotes" v-bind:key="quote.id" v-bind:quote="quote.text" v-bind:quote_by="quote.quote_by" v-bind:submitted_by="quote.submitted_by" />
   </div>
 </template>
 
