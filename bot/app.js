@@ -72,12 +72,14 @@ client.on('message', message => {
 
 async function uploadQuote(message, provokeMessage) {
 	console.log('message');
-	console.log(provokeMessage.author);
+	console.log(provokeMessage);
 	axios.post('http://localhost:1337/quote', {
 		text: message.cleanContent,
 		type: 'discord',
 		quote_by: message.author.username,
-		submitted_by: provokeMessage.author.username 
+		submitted_by: provokeMessage.author.username,
+		discord_server_name: message.channel.guild.name,
+		discord_channel_name: message.channel.name
 	}).then(function (response) {
 		console.log(response);
 		message.channel.send('Upload successful!');

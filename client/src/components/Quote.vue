@@ -1,7 +1,19 @@
 <template>
-	<div class="alert alert-success" role="alert">
-    <h1>{{ quote }}</h1>
-    <p>By {{ quote_by }}. Submitted by {{ submitted_by }}</p>
+	<div class="card mb-3">
+    <div class="card-body">
+      <blockquote class="blockquote text-right">
+        <p class="mb-0">{{ quote }}</p>
+        <footer class="blockquote-footer">
+          {{ quote_by }} 
+          <span v-if="type === 'discord'">
+            via Discord 
+            <span v-if="discord_server_name">
+              - <cite :title="discord_server_name">#{{ discord_channel_name }} on {{ discord_server_name }}</cite>
+            </span>
+          </span>
+        </footer>
+      </blockquote>
+    </div>
   </div>
 </template>
 
@@ -13,6 +25,9 @@ export default {
     quote: String,
     quote_by: String,
     submitted_by: String,
+    type: String,
+    discord_server_name: String,
+    discord_channel_name: String
   },
   methods: {
    

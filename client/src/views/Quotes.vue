@@ -1,22 +1,27 @@
 <template>
   <div class="quotes">
-    <img width="20%" alt="Vue logo" src="../assets/smirkyisms.jpg">
-		<PageHeader header="Quotes"/>
-    <Quote v-for="quote in quotes" v-bind:key="quote.id" v-bind:quote="quote.text" v-bind:quote_by="quote.quote_by" v-bind:submitted_by="quote.submitted_by" />
+    <Quote 
+      v-for="quote in quotes" 
+      v-bind:key="quote.id"
+      v-bind:type="quote.type"
+      v-bind:quote="quote.text"
+      v-bind:discord_server_name="quote.discord_server_name"
+      v-bind:discord_channel_name="quote.discord_channel_name"
+      v-bind:quote_by="quote.quote_by"
+      v-bind:submitted_by="quote.submitted_by"
+    />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import PageHeader from '@/components/PageHeader.vue'
 import Quote from '@/components/Quote.vue'
 import axios from 'axios'
 
 export default {
   name: 'Home',
   components: {
-    Quote,
-    PageHeader
+    Quote
   },
   data () {
     return {

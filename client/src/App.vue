@@ -1,11 +1,16 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Random</router-link> |
-      <router-link to="/quotes">Quotes</router-link> |
-      <a href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddQuote">Add Quote</a>
-    </div>
-    <router-view/>
+    <main role="main">
+      <img width="10%" alt="Vue logo" src="./assets/smirkyisms.jpg" class="mt-3">
+      <div id="nav">
+        <router-link to="/">Random</router-link> |
+        <router-link to="/quotes">Quotes</router-link>
+        <!-- <a href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddQuote">Add Quote</a> -->
+      </div>
+      <div id="main-body" class="container">
+        <router-view/>
+      </div>
+    </main>
     <QuoteModal />
   </div>
 </template>
@@ -35,8 +40,12 @@ export default {
   color: #2c3e50;
 }
 
+#main-body {
+  max-width: 500px;
+}
+
 #nav {
-  padding: 30px;
+  padding: 15px;
 }
 
 #nav a {
