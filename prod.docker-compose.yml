@@ -1,0 +1,22 @@
+version: "3.4"
+services:
+  # Client
+  client:
+    image: th0rn0/smirkyisms-client:latest
+    ports:
+      - "80:8080"
+  server:
+    image: th0rn0/smirkyisms-server:latest
+    links:
+      - mongodb:mongodb
+    ports:
+      - "1337:1337"
+  bot:
+    image: th0rn0/smirkyisms-bot:latest
+  # Mongo DB
+  mongodb:
+    image: mongo:3.6.2-jessie
+    volumes:
+      - ./database:/data/db
+    ports:
+      - "27017:27017"

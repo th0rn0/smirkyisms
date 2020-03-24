@@ -49,7 +49,7 @@ module.exports.datastores = {
     *                                                                          *
     ***************************************************************************/
     adapter: 'sails-mongo',
-    url: 'mongodb://localhost:27017/smirkyisms',
+    url: 'mongodb://mongodb:27017/smirkyisms',
 
   },
 
