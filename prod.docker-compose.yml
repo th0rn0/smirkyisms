@@ -18,6 +18,8 @@ services:
       traefik.http.routers.client-http.middlewares: redirect-https
       traefik.http.middlewares.redirect-https.redirectscheme.scheme: https
       traefik.http.routers.client-https.tls: 'true'
+    networks:
+      - external
   api:
     image: th0rn0/smirkyisms-api:latest
     restart: unless-stopped
@@ -39,6 +41,8 @@ services:
       traefik.http.routers.api-http.middlewares: redirect-https
       traefik.http.middlewares.redirect-https.redirectscheme.scheme: https
       traefik.http.routers.api-https.tls: 'true'
+    networks:
+      - external
   bot:
     image: th0rn0/smirkyisms-bot:latest
     restart: unless-stopped
@@ -47,8 +51,12 @@ services:
       DISCORD_TOKEN: NjkwMjY5ODE1NjY2OTAxMTY2.Xnj-Hg.q03UgYHrZ0TX4LBDNkuRgdXM7Yo
     links:
       - api:api
+    networks:
+      - external
   mongodb:
     image: mongo:3.6.2-jessie
     restart: unless-stopped
     volumes:
       - ./database:/data/db
+    networks:
+      - external
