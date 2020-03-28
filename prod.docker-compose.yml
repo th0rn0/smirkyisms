@@ -60,3 +60,7 @@ services:
       - ./database:/data/db
     networks:
       - external
+networks:
+  external:
+    external:
+      name: external
