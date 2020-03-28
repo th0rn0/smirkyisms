@@ -33,7 +33,7 @@ export default {
   },
   created () {
     axios
-      .get('http://localhost:1337/quote/random')
+      .get(window.appConfig.API_ADDR + '/quote/random')
       .then(response => (this.quote = response.data))
       .catch(e => {
 				this.errors.push(e)

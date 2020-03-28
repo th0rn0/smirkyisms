@@ -6,7 +6,7 @@ const axios = require('axios').default;
 
 // Settings
 const voteTime = 10000;
-const botToken = process.env.TOKEN;
+const botToken = process.env.DISCORD_TOKEN;
 
 // Commands
 const commandId = '.';
@@ -73,7 +73,7 @@ client.on('message', message => {
 async function uploadQuote(message, provokeMessage) {
 	console.log('message');
 	console.log(provokeMessage);
-	axios.post('http://localhost:1337/quote', {
+	axios.post('http://' + process.env.API_IP + ':1337/quote', {
 		text: message.cleanContent,
 		type: 'discord',
 		quote_by: message.author.username,

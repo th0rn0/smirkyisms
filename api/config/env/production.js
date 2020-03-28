@@ -250,24 +250,23 @@ module.exports = {
     * > Be sure to use the right protocol!  ("http://" vs. "https://")         *
     *                                                                          *
     ***************************************************************************/
-    // onlyAllowOrigins: [
-    //   'https://example.com',
-    //   'https://staging.example.com',
-    // ],
+    onlyAllowOrigins: [
+      
+    ],
 
 
-    /***************************************************************************
-    *                                                                          *
-    * If you are deploying a cluster of multiple servers and/or processes,     *
-    * then uncomment the following lines.  This tells Socket.io about a Redis  *
-    * server it can use to help it deliver broadcasted socket messages.        *
-    *                                                                          *
-    * > Be sure a compatible version of @sailshq/socket.io-redis is installed! *
-    * > (See https://sailsjs.com/config/sockets for the latest version info)   *
-    *                                                                          *
-    * (https://sailsjs.com/docs/concepts/deployment/scaling)                   *
-    *                                                                          *
-    ***************************************************************************/
+    // **************************************************************************
+    // *                                                                          *
+    // * If you are deploying a cluster of multiple servers and/or processes,     *
+    // * then uncomment the following lines.  This tells Socket.io about a Redis  *
+    // * server it can use to help it deliver broadcasted socket messages.        *
+    // *                                                                          *
+    // * > Be sure a compatible version of @sailshq/socket.io-redis is installed! *
+    // * > (See https://sailsjs.com/config/sockets for the latest version info)   *
+    // *                                                                          *
+    // * (https://sailsjs.com/docs/concepts/deployment/scaling)                   *
+    // *                                                                          *
+    // **************************************************************************
     // adapter: '@sailshq/socket.io-redis',
     // url: 'redis://user:password@bigsquid.redistogo.com:9562/databasenumber',
     //--------------------------------------------------------------------------

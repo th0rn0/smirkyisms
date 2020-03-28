@@ -1,5 +1,5 @@
 {
-  "name": "smirkyisms-bot",
+  "name": "smirkyisms-discord-bot",
   "version": "1.0.0",
   "main": "app.js",
   "dependencies": {

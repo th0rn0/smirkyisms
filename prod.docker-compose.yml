@@ -1,22 +1,54 @@
 version: "3.4"
 services:
-  # Client
   client:
     image: th0rn0/smirkyisms-client:latest
+    restart: unless-stopped
+    environment:
+      API_ADDR: http://localhost:1337
     ports:
-      - "80:8080"
-  server:
-    image: th0rn0/smirkyisms-server:latest
+      - "80:80"
+    labels:
+      traefik.http.routers.client-http.entrypoints: web
+      traefik.enable: 'true'
+      traefik.http.services.client.loadbalancer.server.port: '80'
+      traefik.http.routers.client-https.rule: Host(`smirkyisms.com`, `www.smirkyisms.com`)
+      traefik.http.routers.client-https.entrypoints: websecure
+      traefik.http.routers.client-https.tls.certresolver: le
+      traefik.http.routers.client-http.rule: Host(`smirkyisms.com`, `www.smirkyisms.com`)
+      traefik.http.routers.client-http.middlewares: redirect-https
+      traefik.http.middlewares.redirect-https.redirectscheme.scheme: https
+      traefik.http.routers.client-https.tls: 'true'
+  api:
+    image: th0rn0/smirkyisms-api:latest
+    restart: unless-stopped
+    environment:
+      MONGO_DB_HOST: mongodb
+      MONGO_DB_PORT: 27017
     links:
       - mongodb:mongodb
     ports:
       - "1337:1337"
+    labels:
+      traefik.http.routers.api-http.entrypoints: web
+      traefik.enable: 'true'
+      traefik.http.services.api.loadbalancer.server.port: '1337'
+      traefik.http.routers.api-https.rule: Host(`api.smirkyisms.com`)
+      traefik.http.routers.api-https.entrypoints: websecure
+      traefik.http.routers.api-https.tls.certresolver: le
+      traefik.http.routers.api-http.rule: Host(`api.smirkyisms.com`)
+      traefik.http.routers.api-http.middlewares: redirect-https
+      traefik.http.middlewares.redirect-https.redirectscheme.scheme: https
+      traefik.http.routers.api-https.tls: 'true'
   bot:
     image: th0rn0/smirkyisms-bot:latest
-  # Mongo DB
+    restart: unless-stopped
+    environment:
+      API_IP: api
+      DISCORD_TOKEN: NjkwMjY5ODE1NjY2OTAxMTY2.Xnj-Hg.q03UgYHrZ0TX4LBDNkuRgdXM7Yo
+    links:
+      - api:api
   mongodb:
     image: mongo:3.6.2-jessie
+    restart: unless-stopped
     volumes:
       - ./database:/data/db
-    ports:
-      - "27017:27017"

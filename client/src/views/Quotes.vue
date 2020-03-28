@@ -30,7 +30,7 @@ export default {
   },
   created () {
     axios
-      .get('http://localhost:1337/quote')
+      .get(window.appConfig.API_ADDR + '/quote')
       .then(response => (this.quotes = response.data))
       .catch(e => {
 				this.errors.push(e)

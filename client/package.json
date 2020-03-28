@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "smirkyisms-client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,6 +12,7 @@
     "bootswatch": "^4.4.1",
     "core-js": "^3.6.4",
     "discord.js": "^12.0.2",
+    "dotenv": "^8.2.0",
     "jquery": "^3.4.1",
     "popper.js": "^1.16.1",
     "vue": "^2.6.11",

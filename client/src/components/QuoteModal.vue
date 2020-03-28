@@ -55,15 +55,16 @@ export default {
       e.preventDefault();
       let currentObj = this;
       axios
-        .post('http://localhost:1337/quote', {
+        .post('http://' + process.env.SERVER_IP + ':1337/quote', {
           text: this.quote
         })
         .then(response => {
-          console.log(response);
+          // console.log(response);
           currentObj.output = response.data;
         })
         .catch(e => {
-          console.error(e);
+          this.errors.push(e)
+          // console.error(e);
         });
     }
   }
