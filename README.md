@@ -29,4 +29,4 @@ Deploy the stack using the docker-compose file in the docker directory. A Traefi
 
 ## Bot Usage
 
-```.smirketpin <messageid``` This will initiate a vote. Once passed it will upload the quote to https://smirkyisms.com
+```.smirketpin <messageid>``` This will initiate a vote. Once passed it will upload the quote to https://smirkyisms.com
