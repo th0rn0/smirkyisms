@@ -7,6 +7,7 @@ const axios = require('axios').default;
 // Settings
 const voteTime = 10000;
 const botToken = process.env.DISCORD_TOKEN;
+const apiAddr = process.env.API_ADDR;
 
 // Commands
 const commandId = '.';
@@ -57,7 +58,7 @@ client.on('message', message => {
 				});
 				if (upvote > downvote) {
 					message.channel.send('Vote was successful. Uploading to Smirkisms.com...');
-					uploadQuote(message, provokeMessage);
+					uploadQuote(message, provokeMessage, apiAddr);
 				} else {
 					message.channel.send('Vote was unsuccessful. Quote something better!');
 				}
@@ -70,10 +71,10 @@ client.on('message', message => {
 	}
 });
 
-async function uploadQuote(message, provokeMessage) {
+async function uploadQuote(message, provokeMessage, apiAddr) {
 	console.log('message');
 	console.log(provokeMessage);
-	axios.post('http://' + process.env.API_IP + ':1337/quote', {
+	axios.post(apiAddr + '/quote', {
 		text: message.cleanContent,
 		type: 'discord',
 		quote_by: message.author.username,

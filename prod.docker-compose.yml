@@ -1,12 +1,10 @@
-version: "3.4"
+version: "2"
 services:
   client:
     image: th0rn0/smirkyisms-client:latest
     restart: unless-stopped
     environment:
-      API_ADDR: https://api.smirkyisms.com:1337
-    # ports:
-    #   - "80:80"
+      API_ADDR: https://api.smirkyisms.com
     labels:
       traefik.http.routers.client-http.entrypoints: web
       traefik.enable: 'true'
@@ -26,10 +24,6 @@ services:
     environment:
       MONGO_DB_HOST: mongodb
       MONGO_DB_PORT: 27017
-    # ports:
-    #   - "1337:1337"
-    links:
-      - mongodb:mongodb
     labels:
       traefik.http.routers.api-http.entrypoints: web
       traefik.enable: 'true'
@@ -48,17 +42,15 @@ services:
     image: th0rn0/smirkyisms-bot:latest
     restart: unless-stopped
     environment:
-      API_IP: api
+      API_ADDR: http://api:1337
       DISCORD_TOKEN: ${DISCORD_TOKEN}
-    links:
-      - api:api
     networks:
-      - external
+      - smirkyisms-internal
   mongodb:
-    image: mongo:3.6.2-jessie
+    image: webhippie/mongodb:latest
     restart: unless-stopped
     volumes:
-      - smirkyisms-database:/data/db
+      - smirkyisms-mongodb:/data/db
     networks:
       - smirkyisms-internal
 networks:
@@ -66,5 +58,3 @@ networks:
     external:
       name: external
   smirkyisms-internal:
-volumes:
-  smirkyisms-database:
