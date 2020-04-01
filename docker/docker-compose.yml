@@ -3,6 +3,8 @@ services:
   client:
     image: th0rn0/smirkyisms-client:latest
     restart: unless-stopped
+    ports:
+      - 80:80
     environment:
       API_ADDR: https://api.smirkyisms.com
     labels:
@@ -58,3 +60,5 @@ networks:
     external:
       name: external
   smirkyisms-internal:
+volumes:
+  smirkyisms-mongodb:

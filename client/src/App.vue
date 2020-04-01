@@ -5,7 +5,7 @@
       <div id="nav">
         <router-link to="/">Random</router-link> |
         <router-link to="/quotes">Quotes</router-link>
-        <!-- <a href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddQuote">Add Quote</a> -->
+        <a href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddQuote">Add Quote</a>
       </div>
       <div id="main-body" class="container">
         <router-view/>
