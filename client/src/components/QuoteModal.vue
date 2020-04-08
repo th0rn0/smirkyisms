@@ -55,8 +55,11 @@ export default {
       e.preventDefault();
       let currentObj = this;
       axios
-        .post('http://' + process.env.SERVER_IP + ':1337/quote', {
-          text: this.quote
+        .post(window.appConfig.API_ADDR + '/quote', {
+          text: this.quote,
+          type: 'site',
+          quote_by: 'asd',
+          submitted_by: 'thisguy'
         })
         .then(response => {
           // console.log(response);

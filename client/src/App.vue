@@ -4,7 +4,7 @@
       <img width="10%" alt="Vue logo" src="./assets/smirkyisms.jpg" class="mt-3">
       <div id="nav">
         <router-link to="/">Random</router-link> |
-        <router-link to="/quotes">Quotes</router-link>
+        <router-link to="/quotes">Quotes</router-link> |
         <a href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddQuote">Add Quote</a>
       </div>
       <div id="main-body" class="container">
