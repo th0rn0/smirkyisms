@@ -5,7 +5,10 @@
       <div id="nav">
         <router-link to="/">Random</router-link> |
         <router-link to="/quotes">Quotes</router-link> |
-        <a href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddQuote">Add Quote</a>
+        <a v-if="$auth.isAuthenticated" href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddQuote">Add Quote</a><span v-if="$auth.isAuthenticated"> | </span> 
+        <!-- Check that the SDK client is not currently loading before accessing is methods -->
+        <a v-if="$auth.isAuthenticated" @click="logout" class="button is-dark"><strong>Log out</strong></a>
+        <a v-if="!$auth.isAuthenticated" @click="login" class="button is-dark"><strong>Sign in</strong></a>
       </div>
       <div id="main-body" class="container">
         <router-view/>
@@ -26,6 +29,18 @@ export default {
   data() {
     return {
       quote: null
+    }
+  },
+  methods: {
+    // Log the user in
+    login() {
+      this.$auth.loginWithRedirect();
+    },
+    // Log the user out
+    logout() {
+      this.$auth.logout({
+        returnTo: window.location.origin
+      });
     }
   }
 }
