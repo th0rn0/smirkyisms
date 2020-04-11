@@ -1,7 +1,7 @@
 <template>
-  <div class="home">
-    <PageHeader header="Smirkyisms"/>
+  <div class="quotes">
     <Quote 
+      v-for="quote in quotes" 
       v-bind:key="quote.id"
       v-bind:type="quote.type"
       v-bind:quote="quote.text"
@@ -16,26 +16,23 @@
 
 <script>
 // @ is an alias to /src
-import PageHeader from '@/components/PageHeader.vue'
 import Quote from '@/components/Quote.vue'
 import axios from 'axios'
 
 export default {
   name: 'Home',
   components: {
-    PageHeader,
     Quote
   },
   data () {
     return {
-      quote: null,
-      errors: [],
+      quotes: null
     }
   },
   created () {
     axios
-      .get(window.appConfig.API_ADDR + '/quote/random')
-      .then(response => (this.quote = response.data))
+      .get(window.appConfig.API_ADDR + '/quote?sort=createdAt%20DESC')
+      .then(response => (this.quotes = response.data))
       .catch(e => {
 				this.errors.push(e)
 			})

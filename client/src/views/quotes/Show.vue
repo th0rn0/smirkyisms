@@ -1,7 +1,6 @@
 <template>
   <div class="quotes">
     <Quote 
-      v-for="quote in quotes" 
       v-bind:key="quote.id"
       v-bind:type="quote.type"
       v-bind:quote="quote.text"
@@ -25,13 +24,14 @@ export default {
   },
   data () {
     return {
-      quotes: null
+      quote: null
     }
   },
   created () {
+		console.log(this.$route.params);
     axios
-      .get(window.appConfig.API_ADDR + '/quote')
-      .then(response => (this.quotes = response.data))
+      .get(window.appConfig.API_ADDR + '/quote/' + this.$route.params.id)
+      .then(response => (this.quote = response.data))
       .catch(e => {
 				this.errors.push(e)
 			})

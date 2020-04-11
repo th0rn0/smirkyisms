@@ -11,6 +11,9 @@
               - <cite :title="discord_server_name">#{{ discord_channel_name }} on {{ discord_server_name }}</cite>
             </span>
           </span>
+          <div v-if="id">
+            <a :href="'/quotes/' + id">permalink</a>
+          </div>
         </footer>
       </blockquote>
     </div>
@@ -27,7 +30,8 @@ export default {
     submitted_by: String,
     type: String,
     discord_server_name: String,
-    discord_channel_name: String
+    discord_channel_name: String,
+    id: String
   },
   methods: {
    

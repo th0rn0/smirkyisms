@@ -53,22 +53,36 @@ export default {
         this.errors.push('A Quote required.');
       }
       e.preventDefault();
-      let currentObj = this;
-      axios
-        .post(window.appConfig.API_ADDR + '/quote', {
-          text: this.quote,
-          type: 'site',
-          quote_by: 'asd',
-          submitted_by: 'thisguy'
-        })
-        .then(response => {
-          // console.log(response);
-          currentObj.output = response.data;
-        })
-        .catch(e => {
-          this.errors.push(e)
-          // console.error(e);
-        });
+      this.$auth.getTokenSilently().then(accessToken => {
+        console.log(accessToken);
+        let currentObj = this;
+        axios
+          .post(
+            window.appConfig.API_ADDR + '/quote', 
+            {
+              text: this.quote,
+              type: 'site',
+              quote_by: 'asd',
+              submitted_by: 'thisguy'
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`
+              }
+            }
+          )
+          .then(response => {
+            // console.log(response);
+            currentObj.output = response.data;
+          })
+          .catch(e => {
+            this.errors.push(e)
+            // console.error(e);
+          });
+      }).catch(e => {
+        this.errors.push(e)
+        console.error('here');
+      });
     }
   }
 }
