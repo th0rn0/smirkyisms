@@ -9,6 +9,7 @@ module.exports = {
   tableName: 'quotes',
   datastore: 'default',
   attributes: {
+    user_id: { type: 'string', required: true },
     quote_by: { type: 'string', required: true },
     submitted_by: { type: 'string', required: true },
     discord_channel_name: { type: 'string' },
