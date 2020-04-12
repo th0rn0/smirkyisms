@@ -20,6 +20,9 @@ module.exports.routes = {
   ***************************************************************************/
 
   'GET /quote/random': { action: 'quote/random' },
+  'GET /quote': { action: 'quote/index' },
+  'GET /quote/:quoteId': { action: 'quote/show' },
+  'GET /users': { action: 'user/index' },
 
 
   /***************************************************************************

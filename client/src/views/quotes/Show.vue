@@ -8,6 +8,7 @@
       v-bind:discord_channel_name="quote.discord_channel_name"
       v-bind:quote_by="quote.quote_by"
       v-bind:submitted_by="quote.submitted_by"
+      v-bind:name="quote.name"
     />
   </div>
 </template>

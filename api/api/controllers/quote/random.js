@@ -4,7 +4,7 @@ module.exports = {
   friendlyName: 'Random',
 
 
-  description: 'Random quote.',
+  description: 'Get Random Quote.',
 
 
   inputs: {
@@ -19,12 +19,8 @@ module.exports = {
 
   fn: async function (inputs) {
 
-    var quote = await Quote.count()
-      .then(count => Quote.find().limit(1).skip(parseInt(Math.random() * count)))
-      .catch(sails.log.error);
-
-    return quote[0];
+    var quote = await Quote.getRandom();
+    
+    return quote;
   }
-
-
 };

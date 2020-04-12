@@ -8,6 +8,10 @@ const axios = require('axios').default;
 const voteTime = 10000;
 const botToken = process.env.DISCORD_TOKEN;
 const apiAddr = process.env.API_ADDR;
+const auth0ClientId = process.env.AUTH0_CLIENT_ID;
+const auth0ClientSecret = process.env.AUTH0_CLIENT_SECRET;
+const auth0Audience = process.env.AUTH0_AUDIENCE;
+const auth0BotUserId = process.env.AUTH0_BOT_USER_ID; 
 
 // Commands
 const commandId = '.';
@@ -74,16 +78,39 @@ client.on('message', message => {
 async function uploadQuote(message, provokeMessage, apiAddr) {
 	console.log('message');
 	console.log(provokeMessage);
-	axios.post(apiAddr + '/quote', {
-		text: message.cleanContent,
-		type: 'discord',
-		quote_by: message.author.username,
-		submitted_by: provokeMessage.author.username,
-		discord_server_name: message.channel.guild.name,
-		discord_channel_name: message.channel.name
-	}).then(function (response) {
-		console.log(response);
-		message.channel.send('Upload successful!');
+	axios.post('https://smirkyisms.eu.auth0.com/oauth/token',
+		{
+			client_id: auth0ClientId,
+			client_secret: auth0ClientSecret,
+			audience: auth0Audience,
+			grant_type: "client_credentials"
+		}
+	)
+	.then(function (auth) {
+		axios.post(apiAddr + '/quote', 
+			{
+				text: message.cleanContent,
+				type: 'discord',
+				quote_by: message.author.username,
+				submitted_by: provokeMessage.author.username,
+				discord_server_name: message.channel.guild.name,
+				discord_channel_name: message.channel.name,
+				user_id: auth0BotUserId
+			},
+			{
+	      headers: {
+	        Authorization: `Bearer ${auth.data.access_token}`
+	      }
+	    }
+	  )
+		.then(function (response) {
+			console.log(response);
+			message.channel.send('Upload successful!');
+		})
+		.catch(function (error) {
+			console.log(error);
+			message.channel.send('There was a error! ' + error);
+		})
 	})
 	.catch(function (error) {
 		console.log(error);

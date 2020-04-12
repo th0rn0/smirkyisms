@@ -4,7 +4,7 @@
       <blockquote class="blockquote text-right">
         <p class="mb-0">{{ quote }}</p>
         <footer class="blockquote-footer">
-          {{ quote_by }} 
+          {{ quote_by }} posted by {{ name }}
           <span v-if="type === 'discord'">
             via Discord 
             <span v-if="discord_server_name">
@@ -31,7 +31,9 @@ export default {
     type: String,
     discord_server_name: String,
     discord_channel_name: String,
-    id: String
+    id: String,
+    user_id: String,
+    name: String,
   },
   methods: {
    

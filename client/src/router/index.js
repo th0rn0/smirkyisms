@@ -22,6 +22,11 @@ const routes = [
     path: '/quotes/:id',
     name: 'Quote',
     component: () => import(/* webpackChunkName: "about" */ '../views/quotes/Show.vue')
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Profile.vue')
   }
 ]
 
