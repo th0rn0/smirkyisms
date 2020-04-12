@@ -63,8 +63,7 @@ export default {
               text: this.quote,
               type: 'site',
               quote_by: 'asd',
-              submitted_by: 'thisguy',
-              user_id: this.$auth.user.sub
+              submitted_by: this.$auth.user.sub
             },
             {
               headers: {

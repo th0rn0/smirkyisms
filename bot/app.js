@@ -103,10 +103,10 @@ async function uploadQuote(quoteMessage, provokeMessage, apiAddr) {
 				text: quoteMessage.cleanContent,
 				type: 'discord',
 				quote_by: quoteMessage.author.username,
-				submitted_by: provokeMessage.author.username,
+				discord_submitted_by: provokeMessage.author.username,
 				discord_server_name: quoteMessage.channel.guild.name,
 				discord_channel_name: quoteMessage.channel.name,
-				user_id: auth0BotUserId
+				submitted_by: auth0BotUserId
 			},
 			{
 	      headers: {
