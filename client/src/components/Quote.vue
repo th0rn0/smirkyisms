@@ -1,21 +1,36 @@
 <template>
 	<div class="card mb-3">
-    <div class="card-body">
-      <blockquote class="blockquote text-right">
+    <div class="card-body" style="transform: rotate(0);">
+      <blockquote class="blockquote text-right mb-0">
         <p class="mb-0">{{ quote }}</p>
         <footer class="blockquote-footer">
-          {{ quote_by }} posted by {{ name }}
+          {{ quote_by }} posted by {{ submitted_by }}
           <span v-if="type === 'discord'">
             via Discord 
             <span v-if="discord_server_name">
               - <cite :title="discord_server_name">#{{ discord_channel_name }} on {{ discord_server_name }}</cite>
             </span>
           </span>
-          <div v-if="id">
-            <a :href="'/quotes/' + id">permalink</a>
-          </div>
         </footer>
+        <a v-if="id" class="stretched-link" :href="'/quotes/' + id"></a>
       </blockquote>
+
+    </div>
+    <div v-if="id" class="card-footer text-right text-muted">
+       <social-sharing :url="'https://smirkyisms.com/quotes/' + id"
+                            title="Check Out this Dumb Shit Quote!"
+                            hashtags="smirkyisms,wot,why"
+                            inline-template>
+        <div>
+          Share:
+          <network network="facebook">
+            <i class="fa fa-facebook"></i>
+          </network>&nbsp;&nbsp;&nbsp;
+          <network network="twitter">
+            <i class="fa fa-twitter"></i>
+          </network>
+        </div>
+      </social-sharing>
     </div>
   </div>
 </template>
@@ -32,8 +47,6 @@ export default {
     discord_server_name: String,
     discord_channel_name: String,
     id: String,
-    user_id: String,
-    name: String,
   },
   methods: {
    

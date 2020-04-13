@@ -22,30 +22,25 @@ module.exports = {
       .then(count => Quote.find().limit(1).skip(parseInt(Math.random() * count)))
       .catch(sails.log.error);
 
-    user = await sails.helpers.getUser(quote[0].submitted_by);
-    quote[0].name = user.name;
-
-    return quote[0];
+    return sails.helpers.formatQuote(quote[0]);
   },
 
   getAll: async function () {
     var quotes = await Quote.find();
   
+    var returnQuotes = [];
+
     for (var index in quotes) {
-      user = await sails.helpers.getUser(quotes[index].submitted_by);
-      quotes[index].name = user.name;
+      returnQuotes.push(await sails.helpers.formatQuote(quotes[index]));
     }
 
-    return quotes;
+    return returnQuotes;
   },
 
   getOne: async function (quoteId) {
     var quote = await Quote.findOne({id: quoteId});
   
-    user = await sails.helpers.getUser(quote.submitted_by);
-    quote.name = user.name;
-
-    return quote;
+    return sails.helpers.formatQuote(quote);
   },
 
 };

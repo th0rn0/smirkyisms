@@ -1,5 +1,6 @@
 <template>
   <div class="quotes">
+    <circle-spin v-if="isLoading"></circle-spin>
     <Quote 
       v-for="quote in quotes" 
       v-bind:key="quote.id"
@@ -10,7 +11,6 @@
       v-bind:quote_by="quote.quote_by"
       v-bind:submitted_by="quote.submitted_by"
       v-bind:id="quote.id"
-      v-bind:name="quote.name"
     />
   </div>
 </template>
@@ -25,15 +25,25 @@ export default {
   components: {
     Quote
   },
+  methods: {
+    hideLoading() {
+      this.isLoading = false;
+    }
+  },
   data () {
     return {
-      quotes: null
+      quotes: null,
+      isLoading: false
     }
   },
   created () {
+    this.isLoading = true;
     axios
       .get(window.appConfig.API_ADDR + '/quote?sort=createdAt%20DESC')
-      .then(response => (this.quotes = response.data))
+      .then(response => {
+        this.quotes = response.data;
+        this.isLoading = false;
+      })
       .catch(e => {
 				this.errors.push(e)
 			})

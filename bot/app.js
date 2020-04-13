@@ -120,7 +120,7 @@ async function uploadQuote(quoteMessage, provokeMessage, apiAddr) {
 				.addField('Quote', quoteMessage.content)
 				.addField('Quote By', quoteMessage.author.username)
 				.addField('Submitted By', provokeMessage.author.username)
-				.addField('Go Check it out!', 'https://smirkyisms.com')
+				.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
 				.setFooter('Smirkyisms')
 				.setTimestamp();
 			provokeMessage.channel.send(embed);

@@ -128,7 +128,10 @@ module.exports = {
   },
 
 
-
+  http: {
+    trustProxy: true,
+  },
+  
   /***************************************************************************
   *                                                                          *
   * Configure your security settings for production.                         *
@@ -154,9 +157,10 @@ module.exports = {
     *                                                                          *
     ***************************************************************************/
     cors: {
-      // allowOrigins: [
-      //   'https://example.com',
-      // ]
+      allRoutes: true,
+      allowOrigins: '*',
+      allowCredentials: false,
+      allowRequestHeaders: 'content-type, authorization',
     },
 
   },
@@ -257,7 +261,7 @@ module.exports = {
     *                                                                          *
     ***************************************************************************/
     onlyAllowOrigins: [
-      
+      'https://smirkyisms.com',
     ],
 
 

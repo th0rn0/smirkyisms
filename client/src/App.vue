@@ -1,12 +1,13 @@
 <template>
   <div id="app">
     <main role="main">
-      <img width="10%" alt="Vue logo" src="./assets/smirkyisms.jpg" class="mt-3">
+      <img width="10%" alt="Vue logo" src="./assets/smirkyisms.jpg" class="mt-3 img rounded">
       <div id="nav">
         <router-link to="/">Random</router-link> |
         <router-link to="/quotes">Quotes</router-link> |
         <a v-if="$auth.isAuthenticated" href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddQuote">Add Quote</a><span v-if="$auth.isAuthenticated"> | </span> 
         <!-- Check that the SDK client is not currently loading before accessing is methods -->
+        <router-link v-if="$auth.isAuthenticated" to="/profile">Profile</router-link><span v-if="$auth.isAuthenticated"> | </span> 
         <a v-if="$auth.isAuthenticated" @click="logout" class="button is-dark"><strong>Log out</strong></a>
         <a v-if="!$auth.isAuthenticated" @click="login" class="button is-dark"><strong>Sign in</strong></a>
       </div>
@@ -28,8 +29,11 @@ export default {
   },
   data() {
     return {
-      quote: null
+      quote: null,
     }
+  },
+  created () {
+
   },
   methods: {
     // Log the user in
@@ -56,7 +60,7 @@ export default {
 }
 
 #main-body {
-  max-width: 500px;
+  max-width: 800px;
 }
 
 #nav {

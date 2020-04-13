@@ -11,7 +11,6 @@
       v-bind:submitted_by="quote.submitted_by"
       v-bind:id="quote.id"
       v-bind:user_id="quote.user_id"
-      v-bind:name="quote.name"
     />
   </div>
 </template>
@@ -26,7 +25,7 @@ export default {
   name: 'Home',
   components: {
     PageHeader,
-    Quote
+    Quote,
   },
   data () {
     return {

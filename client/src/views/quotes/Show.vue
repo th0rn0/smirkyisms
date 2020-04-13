@@ -8,7 +8,7 @@
       v-bind:discord_channel_name="quote.discord_channel_name"
       v-bind:quote_by="quote.quote_by"
       v-bind:submitted_by="quote.submitted_by"
-      v-bind:name="quote.name"
+      v-bind:id="quote.id"
     />
   </div>
 </template>
@@ -29,7 +29,6 @@ export default {
     }
   },
   created () {
-		console.log(this.$route.params);
     axios
       .get(window.appConfig.API_ADDR + '/quote/' + this.$route.params.id)
       .then(response => (this.quote = response.data))
