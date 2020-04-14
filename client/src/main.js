@@ -10,11 +10,11 @@ var SocialSharing = require('vue-social-sharing');
 import 'bootstrap'
 import "bootswatch/dist/flatly/bootstrap.min.css"; 
 
-Vue.config.productionTip = false
 
 // Configs
 // Defaults
-// window.appConfig = { API_ADDR: 'http://localhost:1337', AUTH0_DOMAIN: '', AUTH0_CLIENT_ID: '', AUTH0_AUDIENCE: '' } 
+Vue.config.productionTip = false
+// window.appConfig = { API_ADDR: "https://someapi" }
 
 import { domain, clientId, audience } from "../auth_config.json";
 

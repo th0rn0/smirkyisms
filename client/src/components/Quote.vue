@@ -14,7 +14,6 @@
         </footer>
         <a v-if="id" class="stretched-link" :href="'/quotes/' + id"></a>
       </blockquote>
-
     </div>
     <div v-if="id" class="card-footer text-right text-muted">
        <social-sharing :url="'https://smirkyisms.com/quotes/' + id"

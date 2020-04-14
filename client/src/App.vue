@@ -8,8 +8,8 @@
         <a v-if="$auth.isAuthenticated" href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddQuote">Add Quote</a><span v-if="$auth.isAuthenticated"> | </span> 
         <!-- Check that the SDK client is not currently loading before accessing is methods -->
         <router-link v-if="$auth.isAuthenticated" to="/profile">Profile</router-link><span v-if="$auth.isAuthenticated"> | </span> 
-        <a v-if="$auth.isAuthenticated" @click="logout" class="button is-dark"><strong>Log out</strong></a>
-        <a v-if="!$auth.isAuthenticated" @click="login" class="button is-dark"><strong>Sign in</strong></a>
+        <a v-if="$auth.isAuthenticated" @click="logout" class="button is-dark">Log out</a>
+        <a v-if="!$auth.isAuthenticated" @click="login" class="button is-dark">Sign in</a>
       </div>
       <div id="main-body" class="container">
         <router-view/>

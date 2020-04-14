@@ -18,6 +18,11 @@
               </ul>
             </p>
             <div class="form-group">
+              <label for="quoteByLabel">Who said it?</label>
+              <input class="form-control" type="text" v-model="quote_by" placeholder="Who said it?">
+            </div>
+            <div class="form-group">
+              <label for="exampleInputEmail1">Quote</label>
               <textarea class="form-control" v-model="quote" placeholder="Some Funny Quote"></textarea>
               <input type="hidden" name="url" value="">
             </div>
@@ -50,6 +55,12 @@ export default {
       if (!this.quote) {
         this.errors.push('A Quote required.');
       }
+      if (!this.quote_by) {
+        this.errors.push('A Name required.');
+      }
+      if (!this.$auth.isAuthenticated) {
+        this.errors.push('You must Login first!');
+      }
       e.preventDefault();
       this.$auth.getTokenSilently().then(accessToken => {
         let currentObj = this;
@@ -60,7 +71,7 @@ export default {
             {
               text: this.quote,
               type: 'site',
-              quote_by: 'asd',
+              quote_by: this.quote_by,
               submitted_by: this.$auth.user.sub
             },
             {
