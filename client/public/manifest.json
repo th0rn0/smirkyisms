@@ -1,0 +1,26 @@
+{
+	"dir" : "ltr",
+	"lang" : "en",
+	"name" : "Smirkyisms",
+	"scope" : "/",
+	"display" : "browser",
+	"start_url" : "https://smirkyisms.com/",
+	"short_name" : "Smirkyisms",
+	"theme_color" : "transparent",
+	"description" : "Smirkyisms",
+	"orientation" : "any",
+	"background_color" : "transparent",
+	"related_applications" : [],
+	"prefer_related_applications" : false,
+	"icons" : [
+		{
+			"src": "https://smirkyisms.com/icon.jpg",
+			"sizes": "512x512"
+		},
+		{
+			"src": "https://smirkyisms.com/favicon.ico",
+			"sizes": "32x32"
+		}],
+	"url" : "https://smirkyisms.com",
+	"generated" : "true"
+}
