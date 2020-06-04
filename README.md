@@ -30,3 +30,4 @@ Deploy the stack using the docker-compose file in the docker directory. A Traefi
 ## Bot Usage
 
 ```.smirketpin <messageid>``` This will initiate a vote. Once passed it will upload the quote to https://smirkyisms.com
+```.smirketrandom``` Get a random Quote from https://smirkyisms.com

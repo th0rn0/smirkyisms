@@ -16,6 +16,8 @@ const auth0BotUserId = process.env.AUTH0_BOT_USER_ID;
 // Commands
 const commandId = '.';
 const commandQuote = commandId + 'smirketpin';
+const commandGet = commandId + 'smirketget';
+const commandRandom = commandId + 'smirketrandom';
 
 // Bot
 client.login(botToken);
@@ -23,12 +25,12 @@ client.login(botToken);
 client.on('ready', () => {
   console.info(`Logged in as ${client.user.tag}!`);
 	client.user.setActivity('Eating Pizza Sandwiches');
-
 });
 
 client.on('message', message => {
 	if (message.author.bot) return;
 
+	// Quote
 	if (message.content.toLowerCase().startsWith(commandQuote)) {
 		var messageId = message.content.split(commandQuote + ' ')[1];
 		console.log(messageId);
@@ -74,12 +76,23 @@ client.on('message', message => {
 		return;
 	}
 
+	// Get Quote
+	if (message.content.toLowerCase().startsWith(commandGet)) {
+		message.channel.send('TBC');
+	}
+
+	// Get Random
+	if (message.content.toLowerCase().startsWith(commandRandom)) {
+		getRandom(message, apiAddr);
+	}
+
 	if (message.content.toLowerCase().startsWith('.help')) {
 	    var embed = new Discord.MessageEmbed()
 			.setColor('#0099ff')
 			.setTitle('Heyup ' + message.author.username + '!')
 			.setDescription('Here are the commands I know')
-			.addField(commandQuote + ' <message id here>', 'This will initiate a vote to quote something and upload to Smirkyisms!')
+			.addField(commandQuote + ' <message id here>', 'This will initiate a vote to quote something and upload to Smirkyisms.')
+			.addField(commandRandom, 'Get random Quote from Smirkyisms.')
 			.addField('\u200B', '\u200B')
 			.addField('How do I get the Message ID?', 'First you must enable developer mode on Discord and then you can right click a message and click "Copy ID". EZ PZ')
 			.setFooter('Smirkyisms')
@@ -131,4 +144,37 @@ async function uploadQuote(quoteMessage, provokeMessage, apiAddr) {
 		})
 	});
 
+}
+
+async function getRandom(message, apiAddr) {
+	axios.get(apiAddr + '/quote/random')
+	.then(function (response) {
+		console.log(response);
+		if (response.data.type == 'site') {
+			var embed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.addField('Quote', response.data.text)
+				.addField('Quote By', response.data.quote_by)
+				.addField('Submitted By', response.data.submitted_by)
+				.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
+				.setFooter('Smirkyisms')
+				.setTimestamp();
+		} else if (response.data.type == 'discord') {
+			var embed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.addField('Quote', response.data.text)
+				.addField('Quote By', response.data.quote_by)
+				.addField('Submitted By', response.data.discord_submitted_by)
+				.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
+				.setFooter('Smirkyisms')
+				.setTimestamp();	
+		} else {
+			var embed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.addField('Quote', "Type not supported. Bug Th0rn0")
+				.setFooter('Smirkyisms')
+				.setTimestamp();	
+		}
+		message.channel.send(embed);
+	});
 }
