@@ -16,15 +16,15 @@ module.exports = {
   },
 
 
-  exits: {
-    success: {
-      outputFriendlyName: 'User',
-    },
-    notFound: {
-      description: 'No quote with the specified ID was found in the database.',
-      responseType: 'notFound'
-    }
-  },
+  // exits: {
+  //   success: {
+  //     outputFriendlyName: 'User',
+  //   },
+  //   notFound: {
+  //     description: 'No quote with the specified ID was found in the database.',
+  //     responseType: 'notFound'
+  //   }
+  // },
 
 
   fn: async function (inputs) {

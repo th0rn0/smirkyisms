@@ -22,6 +22,7 @@ module.exports.routes = {
   'GET /quote/random': { action: 'quote/random' },
   'GET /quote': { action: 'quote/index' },
   'GET /quote/:quoteId': { action: 'quote/show' },
+  'POST /image': { action: 'image/upload' },
   'GET /users': { action: 'user/index' },
 
 
