@@ -29,11 +29,6 @@ module.exports = {
 	      	responseType: 'badRequest'
 	    },
 
-	    tooBig: {
-	      	description: 'The file is too big.',
-	      	responseType: 'badRequest'
-	    },
-
         serverError: {
 	      	description: `Failed to upload the file`,
 	      	responseType: 'server error',
