@@ -50,6 +50,7 @@ export default {
         let formData = new FormData();
         formData.append('image', this.image);
         formData.append('type', 'site');
+        formData.append('submitted_by', this.$auth.user.sub);
         axios
           .post(
             window.appConfig.API_ADDR + '/image', 
@@ -65,6 +66,8 @@ export default {
             // console.log(response);
             currentObj.output = response.data;
             if (response.status == 200) {
+              console.log('asdasdasdsadas');
+              console.log(response);
               this.$router.push({ path : '/images/' + response.data.id });
               // console.log(response.data.id);
               window.location.href = '/images/' + response.data.id;

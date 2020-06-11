@@ -1,10 +1,10 @@
 module.exports = {
 
 
-  	friendlyName: 'Upload',
+  	friendlyName: 'Create',
 
 
-  	description: 'Upload Image',
+  	description: 'Create Image',
 
   	inputs: {
 	  	image: {
@@ -49,23 +49,24 @@ module.exports = {
 		    maxBytes: 10000000,
 		    maxTimeToBuffer: 5000,
 		    dirname: require('path').resolve(sails.config.appPath, 'assets/images')
-	  	},async function whenDone(err, uploadedFiles) {
+	  	},function whenDone(err, uploadedFiles) {
 		    if (err) {
 		      	return exits.serverError(err);
 		    }
 		    // If no files were uploaded, respond with an error.
 		    if (uploadedFiles.length === 0){
-		      	console.log('No file was uploaded');
 		    	return exits.noFileAttached();
+		      	console.log('No file was uploaded');
 		    }
 		    console.log(uploadedFiles[0]);
-		    var image = await Image.create({
+		    Image.create({
 		    	submitted_by: inputs.submitted_by,
 				type: inputs.type,
 				image_path: uploadedFiles[0].fd
-			}).fetch()
-			console.log(image)
-			return exits.success(image);
+			}).exec(function (err){
+		      if (err) return exits.serverError(err);
+		    });
 	    });
+	    return exits.success();
   	}
 };
