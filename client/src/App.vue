@@ -5,6 +5,7 @@
       <div id="nav">
         <router-link to="/">Random</router-link> |
         <router-link to="/quotes">Quotes</router-link> |
+        <router-link to="/images">Images</router-link> |
         <a v-if="$auth.isAuthenticated" href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddQuote">Add Quote</a><span v-if="$auth.isAuthenticated"> | </span> 
         <a v-if="$auth.isAuthenticated" href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddImage">Add Image</a><span v-if="$auth.isAuthenticated"> | </span> 
         <!-- Check that the SDK client is not currently loading before accessing is methods -->

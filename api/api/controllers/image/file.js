@@ -1,8 +1,8 @@
 module.exports = {
 
-	friendlyName: 'showInfo',
+	friendlyName: 'Show Image File',
 
-	description: 'Show Info',
+	description: 'Show Image',
 
 	inputs: {
 		imageId: {
@@ -15,6 +15,7 @@ module.exports = {
 	exits: {
 		success: {
 		  outputFriendlyName: 'Image',
+		  contentType: 'image/png'
 		},
 		notFound: {
 		  description: 'No quote with the specified ID was found in the database.',
@@ -23,23 +24,24 @@ module.exports = {
     serverError: {
     	description: `Failed to download the file`,
     	responseType: 'serverError',
-  	}
+		}
 	},
 
 	fn: async function (inputs, exits) {
-  	var image = await Image.findOne(
-			{
-				where: {
-					id: inputs.imageId
-				},
-				select: ['id', 'submitted_by', 'discord_submitted_by', 'type']
-			}
-		);
+  	var image = await Image.findOne(inputs.imageId);
     if (!image) {
     	return exits.notFound();
     }
-    sails.helpers.formatImageInfo(image).then(image => {
-    	return exits.success(image);
-    });
+   	var SkipperDisk = require('skipper-disk');
+  	var fileAdapter = SkipperDisk(/* optional opts */);
+    // Stream the file down
+   	fileAdapter.read(
+   		image.image_path
+		, async function whenDone(err, file) {
+      if(err) {
+        return exits.serverError(err);
+      }
+      return exits.success(Buffer.from(file).toString('base64'));
+  	});
 	}
 };

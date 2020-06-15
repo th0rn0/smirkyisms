@@ -14,30 +14,12 @@ module.exports = {
     type: { type: 'string', required: true },
     image_path: { type: 'string', required: true }, // ID of user submitting the Quote. If bot, bot ID will be used.
   },
-  // getRandom: async function () {
-  //   var quote = await Quote.count()
-  //     .then(count => Quote.find().limit(1).skip(parseInt(Math.random() * count)))
-  //     .catch(sails.log.error);
+  getRandom: async function () {
+    var image = await Image.count()
+      .then(count => Image.find({select: ['id', 'submitted_by', 'discord_submitted_by', 'type']}).limit(1).skip(parseInt(Math.random() * count)))
+      .catch(sails.log.error);
 
-  //   return sails.helpers.formatQuote(quote[0]);
-  // },
-
-  // getAll: async function () {
-  //   var quotes = await Quote.find();
-  
-  //   var returnQuotes = [];
-
-  //   for (var index in quotes) {
-  //     returnQuotes.push(await sails.helpers.formatQuote(quotes[index]));
-  //   }
-
-  //   return returnQuotes;
-  // },
-
-  // getOne: async function (quoteId) {
-  //   var quote = await Quote.findOne({id: quoteId});
-  
-  //   return sails.helpers.formatQuote(quote);
-  // },
+    return image[0];
+  },
 
 };

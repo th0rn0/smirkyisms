@@ -1,11 +1,8 @@
 module.exports = {
 
-
   friendlyName: 'FormatQuote',
 
-
   description: 'Format a Quote with the User Data',
-
 
   inputs: {
     quote: {
@@ -15,16 +12,13 @@ module.exports = {
     }
   },
 
-
   exits: {
     success: {
       outputFriendlyName: 'Quote',
     }
   },
 
-
   fn: async function (inputs) {
-
     var name;
     if (inputs.quote.type == 'discord') {
       name = inputs.quote.discord_submitted_by;
@@ -37,7 +31,4 @@ module.exports = {
 
     return inputs.quote;
   }
-
-
 };
-

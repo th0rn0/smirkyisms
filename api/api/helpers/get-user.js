@@ -1,11 +1,8 @@
 module.exports = {
 
-
   friendlyName: 'Get user',
 
-
   description: 'Get a User from Auth0',
-
 
   inputs: {
     userId: {
@@ -15,20 +12,13 @@ module.exports = {
     }
   },
 
-
-  // exits: {
-  //   success: {
-  //     outputFriendlyName: 'User',
-  //   },
-  //   notFound: {
-  //     description: 'No quote with the specified ID was found in the database.',
-  //     responseType: 'notFound'
-  //   }
-  // },
-
+  exits: {
+    success: {
+      outputFriendlyName: 'User',
+    },
+  },
 
   fn: async function (inputs) {
-
     var ManagementClient = require('auth0').ManagementClient;
 
     var management = new ManagementClient({
@@ -42,7 +32,4 @@ module.exports = {
 
     return user;
   }
-
-
 };
-

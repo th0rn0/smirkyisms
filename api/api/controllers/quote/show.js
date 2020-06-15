@@ -1,11 +1,8 @@
 module.exports = {
 
-
   friendlyName: 'Show',
 
-
-  description: 'Get Quote.',
-
+  description: 'Show Quote.',
 
   inputs: {
   	quoteId: {
@@ -14,7 +11,6 @@ module.exports = {
   		required: true
   	}
   },
-
 
   exits: {
     success: {
@@ -26,13 +22,14 @@ module.exports = {
 		}
   },
 
-
-  fn: async function ({quoteId}) {
-
-    var quote = await Quote.getOne(quoteId);
-
-    if (!quote) { throw 'notFound'; }
-
-    return quote;
+  fn: async function (inputs, exits) {
+    var quote = await Quote.findOne({id: inputs.quoteId});
+    if (!quote) {
+      return exits.notFound();
+    }
+    
+    sails.helpers.formatQuote(quote).then(quote => {
+      return exits.success(quote);
+    });
   }
 };

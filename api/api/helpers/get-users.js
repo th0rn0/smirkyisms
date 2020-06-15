@@ -1,28 +1,20 @@
 module.exports = {
 
+  friendlyName: 'GetUsers',
 
-  friendlyName: 'Get Users',
-
-
-  description: '',
-
+  description: 'Get Info for All Users',
 
   inputs: {
 
   },
 
-
   exits: {
-
     success: {
       outputFriendlyName: 'Users',
     },
-
   },
 
-
   fn: async function (inputs) {
-
     var ManagementClient = require('auth0').ManagementClient;
 
     var management = new ManagementClient({
@@ -34,6 +26,4 @@ module.exports = {
 
     return management.getUsers();
   }
-
 };
-

@@ -1,26 +1,30 @@
 module.exports = {
 
-
   friendlyName: 'Index',
 
-
   description: 'Get All Quotes.',
-
 
   inputs: {
 
   },
 
-
   exits: {
-
+    success: {
+      outputFriendlyName: 'Quotes',
+    }
   },
 
+  fn: async function (inputs, exits) {
+    var quotes = await Quote.find();
+    if (!quotes) {
+      return exits.notFound();
+    }
 
-  fn: async function (inputs) {
+    var returnQuotes = [];
+    for (var index in quotes) {
+      returnQuotes.push(await sails.helpers.formatQuote(quotes[index]));
+    }
 
-    var quotes = await Quote.getAll();
-    
-    return quotes;
+    return exits.success(returnQuotes);
   }
 };
