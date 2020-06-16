@@ -66,7 +66,6 @@ export default {
             // console.log(response);
             currentObj.output = response.data;
             if (response.status == 200) {
-              console.log('asdasdasdsadas');
               console.log(response);
               this.$router.push({ path : '/images/' + response.data.id });
               // console.log(response.data.id);

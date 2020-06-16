@@ -12,12 +12,10 @@ module.exports = {
   	type: {
   		description: 'Type of upload',
   		type: 'string',
-  		required: true
   	},
   	submitted_by: {
   		description: 'Whomstve dun it',
   		type: 'string',
-  		required: true
   	}
 	},
 	
@@ -38,12 +36,14 @@ module.exports = {
 
 	files: ['image'],
 
-	fn: async function (inputs, exits) {
+	fn: function (inputs, exits) {
+    console.log('we here');
+    console.log(inputs);
   	inputs.image.upload({
 			noop: false,
 	    // don't allow the total upload size to exceed ~10MB
 	    maxBytes: 10000000,
-	    maxTimeToBuffer: 5000,
+	    maxTimeToBuffer: 10000,
 	    dirname: require('path').resolve(sails.config.appPath, 'assets/images')
   	},async function whenDone(err, uploadedFiles) {
 	    if (err) {

@@ -1,11 +1,14 @@
 // Dependencies
 require('dotenv').config();
-const Discord = require('discord.js');
-const client = new Discord.Client();
+const { Client, MessageAttachment, MessageEmbed } = require('discord.js');
+const client = new Client();
 const axios = require('axios').default;
+const request = require(`request`);
+const fs = require(`fs`);
+const FormData = require('form-data'); 
 
 // Settings
-const voteTime = 30000;
+const voteTime = 10000;
 const botToken = process.env.DISCORD_TOKEN;
 const apiAddr = process.env.API_ADDR;
 const auth0ClientId = process.env.AUTH0_CLIENT_ID;
@@ -36,7 +39,21 @@ client.on('message', message => {
 		console.log(messageId);
 		const provokeMessage = message;
 		message.channel.messages.fetch(messageId).then( quoteMessage => {
-			quoteMessage.channel.send('\n Fair Sik... Starting a 30 Second Vote... \n > ' + quoteMessage.content + ' \n \n Vote Now!').then( voteMessage => {
+
+
+
+
+			if (quoteMessage.attachments.size > 0) {
+				if (message.attachments.every(attachIsImage)){
+					console.log(quoteMessage.attachments.first().url);
+					var attachment = new MessageAttachment(quoteMessage.attachments.first().url);
+			    }
+			}
+
+
+			console.log(attachment);
+
+			quoteMessage.channel.send('\n Fair Sik... Starting a 30 Second Vote... \n > ' + quoteMessage.content + ' \n \n Vote Now!', attachment).then( voteMessage => {
 				voteMessage.react('👍').then(() => voteMessage.react('👎'));
 				const filter = (reaction, user) => {
 					return ['👍', '👎'].includes(reaction.emoji.name);
@@ -45,6 +62,20 @@ client.on('message', message => {
 				const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
 
 				collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+
+
+
+
+				if (quoteMessage.attachments.size > 0) {
+
+					if (message.attachments.every(attachIsImage)){
+						console.log(quoteMessage.attachments.first().url);
+
+				    }
+				}
+
+
+
 
 				collector.on('end', collected => {
 					console.log(`Collected ${collected} items`)
@@ -62,7 +93,21 @@ client.on('message', message => {
 					});
 					if (upvote > downvote) {
 						quoteMessage.channel.send('Vote was successful. Uploading to Smirkyisms.com...');
-						uploadQuote(quoteMessage, provokeMessage, apiAddr);
+						
+
+
+
+						if (quoteMessage.attachments.size > 0) {
+							if (message.attachments.every(attachIsImage)){
+						    	uploadImage(quoteMessage, provokeMessage, apiAddr);
+						    }
+						} else {
+							uploadQuote(quoteMessage, provokeMessage, apiAddr);
+						}
+
+
+
+
 					} else {
 						quoteMessage.channel.send('Vote was unsuccessful. Quote something better!');
 					}
@@ -110,9 +155,10 @@ async function uploadQuote(quoteMessage, provokeMessage, apiAddr) {
 			audience: auth0Audience,
 			grant_type: "client_credentials"
 		}
-	)
-	.then(function (auth) {
-		axios.post(apiAddr + '/quote', {
+	).then(function (auth) {
+		axios.post(
+			apiAddr + '/quote', 
+			{
 				text: quoteMessage.cleanContent,
 				type: 'discord',
 				quote_by: quoteMessage.author.username,
@@ -122,13 +168,13 @@ async function uploadQuote(quoteMessage, provokeMessage, apiAddr) {
 				submitted_by: auth0BotUserId
 			},
 			{
-	      headers: {
-	        Authorization: `Bearer ${auth.data.access_token}`
-	      }
-	    }
-    ).then(function (response) {
+		      	headers: {
+		        	Authorization: `Bearer ${auth.data.access_token}`
+		      	}
+		    }
+	    ).then(function (response) {
 			console.log(response);
-		    var embed = new Discord.MessageEmbed()
+		    var embed = new MessageEmbed()
 				.setColor('#0099ff')
 				.addField('Quote', quoteMessage.content)
 				.addField('Quote By', quoteMessage.author.username)
@@ -137,13 +183,102 @@ async function uploadQuote(quoteMessage, provokeMessage, apiAddr) {
 				.setFooter('Smirkyisms')
 				.setTimestamp();
 			provokeMessage.channel.send(embed);
-		})
-		.catch(function (error) {
+		}).catch(function (error) {
 			console.log(error);
 			provokeMessage.channel.send('There was a error! ' + error);
 		})
 	});
 
+}
+
+async function uploadImage(quoteMessage, provokeMessage, apiAddr) {
+	console.log('image');
+	console.log(provokeMessage);
+
+	// First Download the image to local storage for upload later
+	// var image = await fs.createWriteStream('tmp/file.png');
+	// console.log(image);
+	axios({
+  		method: 'get',
+  		url: quoteMessage.attachments.first().url,
+  		responseType: 'stream'
+	}).then(function (response) {
+    	response.data.pipe(fs.createWriteStream('tmp/file.png'));
+  	});
+
+	console.log('IMAGE HERE');
+	axios.post('https://smirkyisms.eu.auth0.com/oauth/token',
+		{
+			client_id: auth0ClientId,
+			client_secret: auth0ClientSecret,
+			audience: auth0Audience,
+			grant_type: "client_credentials"
+		}
+	).then(function (auth) {
+
+
+		var formData = new FormData();
+        formData.append('image', fs.createReadStream('tmp/file.png'));
+        // formData.append('image', request(quoteMessage.attachments.first().url));
+        formData.append('type', 'discord');
+        formData.append('submitted_by', 'auth0BotUserId');
+
+  //       formData.submit(apiAddr + '/image', function(error, res) {
+		// 	// res.resume();
+  //       	if (error) {
+		// 		console.log(error);
+		// 		provokeMessage.channel.send('There was a error! ' + error);
+  //       	}
+  //       	console.log(res);
+		//     var embed = new MessageEmbed()
+		// 		.setColor('#0099ff')
+		// 		.addField('Submitted By', provokeMessage.author.username)
+		// 		.addField('Go Check it out!', 'https://smirkyisms.com/images/' + res.data.id)
+		// 		.setFooter('Smirkyisms')
+		// 		.setTimestamp();
+		// 	provokeMessage.channel.send(embed);
+		// });
+
+        const headers = Object.assign({
+		    'Authorization': `Bearer ${auth.data.access_token}`,
+		}, formData.getHeaders());
+		axios.post(
+			apiAddr + '/image', 
+			formData,
+			{
+		      	headers: headers
+	    	}
+	    ).then(function (response) {
+			console.log(response);
+		  //   var embed = new Discord.MessageEmbed()
+				// .setColor('#0099ff')
+				// .addField('Image', quoteMessage)
+				// .addField('Submitted By', provokeMessage.author.username)
+				// .addField('Go Check it out!', 'https://smirkyisms.com/images/' + response.data.id)
+				// .setFooter('Smirkyisms')
+				// .setTimestamp();
+			// provokeMessage.channel.send(embed);
+		}).catch(function (error) {
+			console.log(error);
+			provokeMessage.channel.send('There was a error! ' + error);
+		})
+	});
+
+}
+
+async function getBase64(url) {
+  return axios
+    .get(url, {
+      responseType: 'arraybuffer'
+    })
+    .then(response => Buffer.from(response.data, 'binary').toString('base64'))
+}
+
+function attachIsImage(msgAttach) {
+    var url = msgAttach.url;
+    console.log(url)
+    //True if this url is a png image.
+    return url.indexOf("png", url.length - "png".length /*or 3*/) !== -1;
 }
 
 async function getRandom(message, apiAddr) {

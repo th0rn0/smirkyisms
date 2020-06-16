@@ -19,10 +19,10 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
+  'POST /image': { action: 'image/upload' },
   'GET /quote/random': { action: 'quote/random' },
   'GET /quote': { action: 'quote/index' },
   'GET /quote/:quoteId': { action: 'quote/show' },
-  'POST /image': { action: 'image/upload' },
   'GET /image/random': { action: 'image/random' },
   'GET /image': { action: 'image/index' },
   'GET /image/:imageId': { action: 'image/show' },
