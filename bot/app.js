@@ -262,7 +262,9 @@ async function getRandom(message, apiAddr) {
 						.setTimestamp();	
 				}
 				message.channel.send(embed, attachment);
-			})
+			}).catch(function (error) {
+				message.channel.send('Sorry there was a error. Try again. ' + error);
+			});
 		});
 	} else {
 		axios.get(apiAddr + '/quote/random')
@@ -294,6 +296,8 @@ async function getRandom(message, apiAddr) {
 					.setTimestamp();	
 			}
 			message.channel.send(embed);
+		}).catch(function (error) {
+			message.channel.send('Sorry there was a error. Try again. ' + error);
 		});
 	}
 }
