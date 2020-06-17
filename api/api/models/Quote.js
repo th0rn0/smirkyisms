@@ -22,6 +22,6 @@ module.exports = {
       .then(count => Quote.find().limit(1).skip(parseInt(Math.random() * count)))
       .catch(sails.log.error);
 
-    return quote;
+    return quote[0];
   },
 };

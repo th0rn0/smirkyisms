@@ -6,10 +6,9 @@ const axios = require('axios').default;
 const request = require(`request`);
 const fs = require(`fs`);
 const FormData = require('form-data'); 
-const fetch = require('node-fetch');
 
 // Settings
-const voteTime = 10000;
+const voteTime = 30000;
 const botToken = process.env.DISCORD_TOKEN;
 const apiAddr = process.env.API_ADDR;
 const auth0ClientId = process.env.AUTH0_CLIENT_ID;
@@ -34,35 +33,24 @@ client.on('ready', () => {
 client.on('message', message => {
 	if (message.author.bot) return;
 
-	// Quote
+	// Quote / Image
 	if (message.content.toLowerCase().startsWith(commandQuote)) {
 		var messageId = message.content.split(commandQuote + ' ')[1];
-		console.log(messageId);
 		const provokeMessage = message;
 		message.channel.messages.fetch(messageId).then( quoteMessage => {
 			var imageArray = new Array();
-			console.log('checking')
 			if (quoteMessage.attachments.size > 0) {
 				quoteMessage.attachments.forEach(function(attachment) {
 					if (attachIsImage(attachment.url)) {
-						console.log('asdasdasd');
 						imageArray.push(attachment.url);
 					}
 				});
 			}
 			if (quoteMessage.attachments.size > 0 && imageArray.length > 0) {
 				// Image
-				// Only 1 image per attachment allowed. Too lazy to fix right now. Issues with the form type as its not sending extra details over. Possible timeout.
-				if (imageArray.length != 1) {
-					quoteMessage.channel.send('Please only send one Image at a time. Too shit to figure out formdata shit.');
-					return;
-				}
 				imageArray.forEach(function(url) {
-					var url = quoteMessage.attachments.first().url;
 					var attachment = new MessageAttachment(url);
 					var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n \n Vote Now!';
-					console.log('we are here')
-					console.log(url);
 					quoteMessage.channel.send(voteMessageText, attachment).then( voteMessage => {
 						voteMessage.react('👍').then(() => voteMessage.react('👎'));
 						const filter = (reaction, user) => {
@@ -87,8 +75,8 @@ client.on('message', message => {
 										break;
 								}
 							});
-							if (upvote < downvote) {
-								quoteMessage.channel.send('Vote was unsuccessful. Quote something better!');
+							if (upvote <= downvote) {
+								quoteMessage.channel.send('Vote was unsuccessful. Image something better!');
 								return;
 							}
 							quoteMessage.channel.send('Vote was successful. Uploading to Smirkyisms.com...');
@@ -96,7 +84,6 @@ client.on('message', message => {
 						});
 					});
 				});
-
 			} else {
 				// Quote
 				var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n > ' + quoteMessage.content + ' \n \n Vote Now!';
@@ -124,7 +111,7 @@ client.on('message', message => {
 									break;
 							}
 						});
-						if (upvote < downvote) {
+						if (upvote <= downvote) {
 							quoteMessage.channel.send('Vote was unsuccessful. Quote something better!');
 							return;
 						}
@@ -142,11 +129,6 @@ client.on('message', message => {
 		return;
 	}
 
-	// Get Quote
-	if (message.content.toLowerCase().startsWith(commandGet)) {
-		message.channel.send('TBC');
-	}
-
 	// Get Random
 	if (message.content.toLowerCase().startsWith(commandRandom)) {
 		getRandom(message, apiAddr);
@@ -158,17 +140,13 @@ client.on('message', message => {
 			.setTitle('Heyup ' + message.author.username + '!')
 			.setDescription('Here are the commands I know')
 			.addField(commandQuote + ' <message id here>', 'This will initiate a vote to quote something and upload to Smirkyisms.')
-			.addField(commandRandom, 'Get random Quote from Smirkyisms.')
+			.addField(commandRandom, 'Get random Quote or Image from Smirkyisms.')
 			.addField('\u200B', '\u200B')
 			.addField('How do I get the Message ID?', 'First you must enable developer mode on Discord and then you can right click a message and click "Copy ID". EZ PZ')
 			.setFooter('Smirkyisms')
 		message.channel.send(embed);
 	}
 });
-
-// async function startVote(quoteMessage, provokeMessage) {
-
-// }
 
 async function uploadQuote(quoteMessage, provokeMessage, apiAddr) {
 	console.log('message');
@@ -213,22 +191,9 @@ async function uploadQuote(quoteMessage, provokeMessage, apiAddr) {
 			provokeMessage.channel.send('There was a error! ' + error);
 		})
 	});
-
 }
 
-function uploadImage(url, quoteMessage, provokeMessage, apiAddr) {
-	console.log('image');
-	console.log(provokeMessage);
-	// First Download the image to local storage for upload later
-	var randomFileName = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
-	axios({
-  		method: 'get',
-  		url: url,
-  		responseType: 'stream'
-	}).then(function (response) {
-    	response.data.pipe(fs.createWriteStream('tmp/' + randomFileName + '.png'));
-  	});
-
+async function uploadImage(url, quoteMessage, provokeMessage, apiAddr) {
 	axios.post('https://smirkyisms.eu.auth0.com/oauth/token',
 		{
 			client_id: auth0ClientId,
@@ -236,130 +201,99 @@ function uploadImage(url, quoteMessage, provokeMessage, apiAddr) {
 			audience: auth0Audience,
 			grant_type: "client_credentials"
 		}
-	).then(function (auth) {
+	).then(async function (auth) {
 		var formData = new FormData();
-        formData.append('image', fs.createReadStream('tmp/' + randomFileName + '.png'));
         formData.append('type', 'discord');
         formData.append('submitted_by', 'auth0BotUserId');
+		formData.append('discord_submitted_by', provokeMessage.author.username);
+        await formData.append('image', request(url));
 
 
         const headers = Object.assign({
 		    'Authorization': `Bearer ${auth.data.access_token}`,
 		}, formData.getHeaders());
 
-  //       const options = {
-		// 	method: 'POST',
-		// 	body: formData,
-		// 	headers: headers
-		// };
-
-		// (async () => {
-		// 	const response = await fetch(apiAddr + '/image', options);
-		// 	const json = await response.json();
-			
-		// 	console.log(json)
-		// })();
-
-
-		// fetch(apiAddr + '/image', { method: 'POST', body: formData , headers: headers})
-		//     .then(function(res) {
-		//         console.log(res.json());
-		//     }).then(function(json) {
-		//         console.log(json);
-		//     });
-
-
-
-        formData.submit(apiAddr + '/image', function(error, res) {
-			// res.resume();
-        	if (error) {
-				console.log(error);
-				provokeMessage.channel.send('There was a error! ' + error);
-        	}
-        	// res.end();
-        	res.setEncoding('utf8');
-    	  	res.on("data", function(data) {
-			    console.log(data);
-			    console.log(data.id);
-			    var embed = new MessageEmbed()
-					.setColor('#0099ff')
-					.addField('Submitted By', provokeMessage.author.username)
-					// .addField('Go Check it out!', 'https://smirkyisms.com/images/' + data.id)
-					.setFooter('Smirkyisms')
-					.setTimestamp();
-				provokeMessage.channel.send(embed);
-		  	});
-		});
-
-		// axios.post(
-		// 	apiAddr + '/image', 
-		// 	formData,
-		// 	{
-		//       	headers: headers
-	 //    	}
-	 //    ).then(function (response) {
-		// 	console.log(response);
-		//     var embed = new MessageEmbed()
-		// 		.setColor('#0099ff')
-		// 		.addField('Submitted By', provokeMessage.author.username)
-		// 		.addField('Go Check it out!', 'https://smirkyisms.com/images/' + response.data.id)
-		// 		.setFooter('Smirkyisms')
-		// 		.setTimestamp();
-		// 	provokeMessage.channel.send(embed);
-		// 	// Delete the file
-		// 	fs.unlinkSync('tmp/' + randomFileName + '.png');
-		// }).catch(function (error) {
-		// 	console.log(error);
-		// 	provokeMessage.channel.send('There was a error! ' + error);
-		// 	// Delete the file
-		// 	fs.unlinkSync('tmp/' + randomFileName + '.png');
-		// })
+		axios.post(
+			apiAddr + '/image', 
+			formData,
+			{
+		      	headers: headers
+	    	}
+	    ).then(function (response) {
+			console.log(response);
+		    var embed = new MessageEmbed()
+				.setColor('#0099ff')
+				.addField('Submitted By', provokeMessage.author.username)
+				.addField('Go Check it out!', 'https://smirkyisms.com/images/' + response.data.id)
+				.setFooter('Smirkyisms')
+				.setTimestamp();
+			provokeMessage.channel.send(embed);
+		}).catch(function (error) {
+			console.log(error);
+			provokeMessage.channel.send('There was a error! ' + error);
+		})
 	});
 }
 
 function attachIsImage(url) {
-    // var url = msgAttach.url;
-    console.log(url)
-    console.log('wewewewe')
     return(url.match(/\.(jpeg|jpg|gif|png)$/) != null);
 }
 
-// function attachIsImage(url) {
-//     console.log('atta')
-//     // console.log(url.indexOf("png", url.length - "png".length /*or 3*/) !== -1)
-//     //True if this url is a png image.
-//     return url.indexOf("png", url.length - "png".length /*or 3*/) !== -1;
-// }
-
 async function getRandom(message, apiAddr) {
-	axios.get(apiAddr + '/quote/random')
-	.then(function (response) {
-		console.log(response);
-		if (response.data.type == 'site') {
-			var embed = new MessageEmbed()
-				.setColor('#0099ff')
-				.addField('Quote', response.data.text)
-				.addField('Quote By', response.data.quote_by)
-				.addField('Submitted By', response.data.submitted_by)
-				.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
-				.setFooter('Smirkyisms')
-				.setTimestamp();
-		} else if (response.data.type == 'discord') {
-			var embed = new MessageEmbed()
-				.setColor('#0099ff')
-				.addField('Quote', response.data.text)
-				.addField('Quote By', response.data.quote_by)
-				.addField('Submitted By', response.data.discord_submitted_by)
-				.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
-				.setFooter('Smirkyisms')
-				.setTimestamp();	
-		} else {
-			var embed = new MessageEmbed()
-				.setColor('#0099ff')
-				.addField('Quote', "Type not supported. Bug Th0rn0")
-				.setFooter('Smirkyisms')
-				.setTimestamp();	
-		}
-		message.channel.send(embed);
-	});
+	var attachment = null;
+	var randInt = Math.floor(Math.random() * 2);
+    if (randInt == 1) {
+		axios.get(apiAddr + '/image/random')
+		.then(function (response) {
+			axios.get(apiAddr + '/image/' + response.data.id + '/file')
+			.then(function (fileRes) {
+				console.log(fileRes.data);
+				console.log(response.data);
+				var attachment = new MessageAttachment(new Buffer.from(fileRes.data, 'base64'));
+				if (response.data.type == 'site') {
+					var embed = "Courtesy of " + response.data.submitted_by;
+				} else if (response.data.type == 'discord') {
+					var embed = "Courtesy of " + response.data.discord_submitted_by;
+				} else {
+					var embed = new MessageEmbed()
+						.setColor('#0099ff')
+						.addField('Quote', "Type not supported. Bug Th0rn0")
+						.setFooter('Smirkyisms')
+						.setTimestamp();	
+				}
+				message.channel.send(embed, attachment);
+			})
+		});
+	} else {
+		axios.get(apiAddr + '/quote/random')
+		.then(function (response) {
+			console.log(response);
+			if (response.data.type == 'site') {
+				var embed = new MessageEmbed()
+					.setColor('#0099ff')
+					.addField('Quote', response.data.text)
+					.addField('Quote By', response.data.quote_by)
+					.addField('Submitted By', response.data.submitted_by)
+					.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
+					.setFooter('Smirkyisms')
+					.setTimestamp();
+			} else if (response.data.type == 'discord') {
+				var embed = new MessageEmbed()
+					.setColor('#0099ff')
+					.addField('Quote', response.data.text)
+					.addField('Quote By', response.data.quote_by)
+					.addField('Submitted By', response.data.discord_submitted_by)
+					.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
+					.setFooter('Smirkyisms')
+					.setTimestamp();	
+			} else {
+				var embed = new MessageEmbed()
+					.setColor('#0099ff')
+					.addField('Quote', "Type not supported. Bug Th0rn0")
+					.setFooter('Smirkyisms')
+					.setTimestamp();	
+			}
+			message.channel.send(embed);
+		});
+	}
 }

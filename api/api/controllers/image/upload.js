@@ -16,7 +16,11 @@ module.exports = {
   	submitted_by: {
   		description: 'Whomstve dun it',
   		type: 'string',
-  	}
+  	},
+    discord_submitted_by: {
+      description: 'Whomstve dun it',
+      type: 'string',
+    }
 	},
 	
 	exits: {
@@ -44,7 +48,7 @@ module.exports = {
 	    // don't allow the total upload size to exceed ~10MB
 	    maxBytes: 10000000,
 	    maxTimeToBuffer: 10000,
-	    dirname: require('path').resolve(sails.config.appPath, 'assets/images')
+	    dirname: require('path').resolve(sails.config.custom.uploadDir)
   	},async function whenDone(err, uploadedFiles) {
 	    if (err) {
       	return exits.serverError(err);
@@ -59,7 +63,8 @@ module.exports = {
 	    var image = await Image.create({
 	    	submitted_by: inputs.submitted_by,
 				type: inputs.type,
-				image_path: uploadedFiles[0].fd
+				image_path: uploadedFiles[0].fd,
+        discord_submitted_by: inputs.discord_submitted_by
 			}).fetch();
 
 			return exits.success(image);

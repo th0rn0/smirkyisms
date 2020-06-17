@@ -20,10 +20,10 @@ module.exports = {
 		  description: 'No quote with the specified ID was found in the database.',
 		  responseType: 'notFound'
 		},
-    serverError: {
-    	description: `Failed to download the file`,
-    	responseType: 'serverError',
-  	}
+	    serverError: {
+	    	description: `Failed to download the file`,
+	    	responseType: 'serverError',
+	  	}
 	},
 
 	fn: async function (inputs, exits) {
