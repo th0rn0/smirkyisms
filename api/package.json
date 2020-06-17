@@ -12,6 +12,7 @@
     "express-jwt": "^5.3.3",
     "grunt": "1.0.4",
     "jwks-rsa": "^1.7.0",
+    "node-fetch": "^2.6.0",
     "sails": "^1.2.3",
     "sails-hook-grunt": "^4.0.0",
     "sails-hook-orm": "^2.1.1",

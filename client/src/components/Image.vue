@@ -1,8 +1,8 @@
 <template>
 	<div class="card mb-3">
     <div class="card-body" style="transform: rotate(0);">
+			<img :src="'data:image/jpg;base64,' + image" class="img-fluid">
       <blockquote class="blockquote text-right mb-0">
-				<img :src="'data:image/jpg;base64,' + image" class="img-fluid">
         <footer class="blockquote-footer">
           posted by {{ submitted_by }}
           <span v-if="type === 'discord'">
