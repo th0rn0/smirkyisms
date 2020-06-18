@@ -31,3 +31,10 @@ Deploy the stack using the docker-compose file in the docker directory. A Traefi
 
 ```.smirketpin <messageid>``` This will initiate a vote. Once passed it will upload the quote to https://smirkyisms.com
 ```.smirketrandom``` Get a random Quote from https://smirkyisms.com
+
+## Notes
+
+These files need ignoring from the build
+- auth_config.json
+- .env
+- local.js
