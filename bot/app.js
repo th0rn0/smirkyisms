@@ -205,7 +205,7 @@ async function uploadImage(url, quoteMessage, provokeMessage, apiAddr) {
 		var formData = new FormData();
         formData.append('type', 'discord');
         formData.append('submitted_by', 'auth0BotUserId');
-		formData.append('discord_submitted_by', provokeMessage.author.username);
+		formData.append('discord_submitted_by', quoteMessage.author.username);
         await formData.append('image', request(url));
 
 
@@ -223,7 +223,7 @@ async function uploadImage(url, quoteMessage, provokeMessage, apiAddr) {
 			console.log(response);
 		    var embed = new MessageEmbed()
 				.setColor('#0099ff')
-				.addField('Submitted By', provokeMessage.author.username)
+				.addField('Submitted By', quoteMessage.author.username)
 				.addField('Go Check it out!', 'https://smirkyisms.com/images/' + response.data.id)
 				.setFooter('Smirkyisms')
 				.setTimestamp();
