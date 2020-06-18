@@ -28,7 +28,6 @@ export default {
     axios
       .get(window.appConfig.API_ADDR + '/image/' + this.$route.params.id)
       .then(response => {
-        console.log(response);
         this.image = response.data
       })
       .catch(e => {

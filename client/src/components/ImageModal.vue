@@ -43,7 +43,6 @@ export default {
   },
   methods: {
     upload() {
-      console.log(this.image);
       this.$auth.getTokenSilently().then(accessToken => {
         let currentObj = this;
         this.loading = true;
@@ -63,19 +62,16 @@ export default {
             }
           )
           .then(response => {
-            // console.log(response);
             currentObj.output = response.data;
             if (response.status == 200) {
-              console.log(response);
               this.$router.push({ path : '/images/' + response.data.id });
-              // console.log(response.data.id);
               window.location.href = '/images/' + response.data.id;
             }
           })
           .catch(e => {
             this.loading = false;
             this.errors.push(e)
-            console.error(e);
+            // console.error(e);
           });
       }).catch(e => {
         this.loading = false;
@@ -83,59 +79,9 @@ export default {
       });
     },
     onFileSelected: function(e) {
-      console.log(e);
       this.image = e.target.files[0];
-      console.log(this.image);
 
     }
-    // formSubmit: function (e) {
-    //   this.errors = [];
-
-    //   if (!this.quote) {
-    //     this.errors.push('A Quote required.');
-    //   }
-    //   if (!this.quote_by) {
-    //     this.errors.push('A Name required.');
-    //   }
-    //   if (!this.$auth.isAuthenticated) {
-    //     this.errors.push('You must Login first!');
-    //   }
-    //   e.preventDefault();
-    //   this.$auth.getTokenSilently().then(accessToken => {
-    //     let currentObj = this;
-    //     this.loading = true;
-    //     axios
-    //       .post(
-    //         window.appConfig.API_ADDR + '/image', 
-    //         {
-    //           image: this.quote,
-    //           type: 'site'
-    //         },
-    //         {
-    //           headers: {
-    //             Authorization: `Bearer ${accessToken}`
-    //           }
-    //         }
-    //       )
-    //       .then(response => {
-    //         // console.log(response);
-    //         currentObj.output = response.data;
-    //         if (response.status == 200) {
-    //           this.$router.push({ path : '/images/' + response.data.id });
-    //           // console.log(response.data.id);
-    //           window.location.href = '/images/' + response.data.id;
-    //         }
-    //       })
-    //       .catch(e => {
-    //         this.loading = false;
-    //         this.errors.push(e)
-    //         // console.error(e);
-    //       });
-    //   }).catch(e => {
-    //     this.loading = false;
-    //     this.errors.push(e)
-    //   });
-    // }
   }
 }
 </script>

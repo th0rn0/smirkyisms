@@ -19,7 +19,8 @@
     "vue": "^2.6.11",
     "vue-router": "^3.1.5",
     "vue-social-sharing": "^2.4.7",
-    "vue-spinners": "^1.0.2"
+    "vue-spinners": "^1.0.2",
+    "@babel/compat-data": "^7.9.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.2.0",

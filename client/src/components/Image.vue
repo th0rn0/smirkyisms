@@ -55,8 +55,6 @@ export default {
     }
   },
   created () {
-		console.log(this.id)
-		console.log('asdasd');
     axios
       .get(window.appConfig.API_ADDR + '/image/' + this.id + '/file')
       .then(response => {

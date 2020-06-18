@@ -37,7 +37,6 @@ export default {
     axios
       .get(window.appConfig.API_ADDR + '/image?sort=createdAt%20DESC')
       .then(response => {
-        console.log(response.data);
         this.images = response.data;
         this.isLoading = false;
       })
