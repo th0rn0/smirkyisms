@@ -107,68 +107,75 @@ client.on('message', message => {
 			})
 
 			// Send Text as one Quote. If they want separate they should send the IDs separately
-			concatMessages(messages[1]).then( async concatMessage => {
-				console.log('messages');
-				console.log(concatMessage);
+			// Check if every message is from the same person
+			messageCheck = true;
+			await messages[1].forEach(message => {
+				if (messages[1][0].author.username != message.author.username) {
+					messages[1][0].channel.send('Messages not sent by the same person!');
+					messageCheck = false;
+					return;
+				}
+			});
+			if (messageCheck) {
+				concatMessages(messages[1]).then( async concatMessage => {
+					var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n \n' + concatMessage + ' \n \n Vote Now!';
+					messages[1][0].channel.send(voteMessageText).then( voteMessage => {
+						voteMessage.react('👍').then(() => voteMessage.react('👎'));
+						const filter = (reaction, user) => {
+							return ['👍', '👎'].includes(reaction.emoji.name);
+						};
 
-				var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n > ' + concatMessage + ' \n \n Vote Now!';
-				messages[1][0].channel.send(voteMessageText).then( voteMessage => {
-					voteMessage.react('👍').then(() => voteMessage.react('👎'));
-					const filter = (reaction, user) => {
-						return ['👍', '👎'].includes(reaction.emoji.name);
-					};
+						const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
 
-					const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
+						collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
 
-					collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
-
-					collector.on('end', collected => {
-						console.log(`Collected ${collected} items`)
-						let upvote = 0;
-						let downvote = 0;
-						collected.each(voteMessage => {
-							switch (voteMessage._emoji.name) {
-								case '👍':
-									upvote = voteMessage.count;
-									break;
-								case '👎':
-									downvote = voteMessage.count;
-									break;
+						collector.on('end', collected => {
+							console.log(`Collected ${collected} items`)
+							let upvote = 0;
+							let downvote = 0;
+							collected.each(voteMessage => {
+								switch (voteMessage._emoji.name) {
+									case '👍':
+										upvote = voteMessage.count;
+										break;
+									case '👎':
+										downvote = voteMessage.count;
+										break;
+								}
+							});
+							if (upvote <= downvote) {
+								messages[1][0].channel.send('Vote was unsuccessful. Quote something better!');
+								return;
 							}
-						});
-						if (upvote <= downvote) {
-							messages[1][0].channel.send('Vote was unsuccessful. Quote something better!');
-							return;
-						}
-						messages[1][0].channel.send('Vote was successful. Uploading to Smirkyisms.com...');
-						// uploadQuote(concatMessage, messages[1][0], provokeMessage, apiAddr);
-						uploadQuote(
-							concatMessage,
-							messages[1][0].author.username,
-							provokeMessage.author.username,
-							messages[1][0].channel.guild.name,
-							messages[1][0].channel.name,
-							apiAddr
-						).then(response => {
-							console.log('response');
-							console.log(response);
-						    var embed = new MessageEmbed()
-								.setColor('#0099ff')
-								.addField('Quote', concatMessage)
-								.addField('Quote By', messages[1][0].author.username)
-								.addField('Submitted By', provokeMessage.author.username)
-								.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
-								.setFooter('Smirkyisms')
-								.setTimestamp();
-							provokeMessage.channel.send(embed);
-						}).catch(error => {
-							console.log(error);
-							provokeMessage.channel.send('There was a error! ' + error);
-						});
+							messages[1][0].channel.send('Vote was successful. Uploading to Smirkyisms.com...');
+							uploadQuote(
+								concatMessage,
+								messages[1][0].author.username,
+								provokeMessage.author.username,
+								messages[1][0].channel.guild.name,
+								messages[1][0].channel.name,
+								apiAddr
+							).then(response => {
+								console.log('response');
+								console.log(response);
+							    var embed = new MessageEmbed()
+									.setColor('#0099ff')
+									.addField('Quote', concatMessage)
+									.addField('Quote By', messages[1][0].author.username)
+									.addField('Submitted By', provokeMessage.author.username)
+									.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
+									.setFooter('Smirkyisms')
+									.setTimestamp();
+								provokeMessage.channel.send(embed);
+							}).catch(error => {
+								console.log(error);
+								provokeMessage.channel.send('There was a error! ' + error);
+							});
 
+						});
 					});
 				});
-			});
+			}
 		}).catch( error => {
 			console.log(error)
 			message.channel.send('A Message ID Not Recognized. Try Again!');
@@ -225,7 +232,7 @@ async function concatMessages(messages) {
 	for (var i = 0; i < arrayLength; i++) {
 		concatStr.push(messages[i].content);
 	}
-	return concatStr.toString();
+	return concatStr.join(',\n');
 }
 
 async function uploadQuote(quote, quoteBy, submittedBy, serverName, channelName, apiAddr) {
