@@ -35,98 +35,403 @@ client.on('message', message => {
 
 	// Quote / Image
 	if (message.content.toLowerCase().startsWith(commandQuote)) {
-		var messageId = message.content.split(commandQuote + ' ')[1];
+		// var messageIds = message.content.split(commandQuote + ' ')[1];
 		const provokeMessage = message;
-		message.channel.messages.fetch(messageId).then( quoteMessage => {
-			var imageArray = new Array();
-			if (quoteMessage.attachments.size > 0) {
-				quoteMessage.attachments.forEach(function(attachment) {
-					if (attachIsImage(attachment.url)) {
-						imageArray.push(attachment.url);
-					}
-				});
-			}
-			if (quoteMessage.attachments.size > 0 && imageArray.length > 0) {
-				// Image
-				imageArray.forEach(function(url) {
-					var attachment = new MessageAttachment(url);
-					var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n \n Vote Now!';
-					quoteMessage.channel.send(voteMessageText, attachment).then( voteMessage => {
-						voteMessage.react('👍').then(() => voteMessage.react('👎'));
-						const filter = (reaction, user) => {
-							return ['👍', '👎'].includes(reaction.emoji.name);
-						};
 
-						const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
+		// Get all Messages
+		getMessages(provokeMessage).then( async messages => {
 
-						collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+			// Images
+			// Send each Image individually
+			messages[0].forEach( message => {
+				var imageArray = new Array();
+				// Only get Images
+				if (message.attachments.size > 0) {
+					message.attachments.forEach(function(attachment) {
+						if (attachIsImage(attachment.url)) {
+							imageArray.push(attachment.url);
+						}
+					});
+				}
+				if (message.attachments.size > 0 && imageArray.length > 0) {
+					// Image
+					imageArray.forEach(function(url) {
+						var attachment = new MessageAttachment(url);
+						var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n \n Vote Now!';
+						message.channel.send(voteMessageText, attachment).then( voteMessage => {
 
-						collector.on('end', collected => {
-							console.log(`Collected ${collected} items`)
-							let upvote = 0;
-							let downvote = 0;
-							collected.each(voteMessage => {
-								switch (voteMessage._emoji.name) {
-									case '👍':
-										upvote = voteMessage.count;
-										break;
-									case '👎':
-										downvote = voteMessage.count;
-										break;
+
+							castVote(voteMessage).then( result => {
+								if (!result) {
+									message.channel.send('Vote was unsuccessful. Image something better!');
+									return;
 								}
+								message.channel.send('Vote was successful. Uploading to Smirkyisms.com...');
+					    		uploadImage(url, message.author.username, apiAddr).then( response => {
+		    						console.log(response);
+								    var embed = new MessageEmbed()
+										.setColor('#0099ff')
+										.addField('Submitted By', message.author.username)
+										.addField('Go Check it out!', 'https://smirkyisms.com/images/' + response.data.id)
+										.setFooter('Smirkyisms')
+										.setTimestamp();
+									provokeMessage.channel.send(embed);
+					    		}).catch( error => {
+									console.log(error);
+									provokeMessage.channel.send('There was a error! ' + error);
+									return;
+					    		});
+					    		return;
 							});
-							if (upvote <= downvote) {
-								quoteMessage.channel.send('Vote was unsuccessful. Image something better!');
-								return;
-							}
-							quoteMessage.channel.send('Vote was successful. Uploading to Smirkyisms.com...');
-				    		uploadImage(url, quoteMessage, provokeMessage, apiAddr);
+							// voteMessage.react('👍').then(() => voteMessage.react('👎'));
+							// const filter = (reaction, user) => {
+							// 	return ['👍', '👎'].includes(reaction.emoji.name);
+							// };
+
+							// const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
+
+							// collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+
+							// collector.on('end', collected => {
+							// 	console.log(`Collected ${collected} items`)
+							// 	let upvote = 0;
+							// 	let downvote = 0;
+							// 	collected.each(voteMessage => {
+							// 		switch (voteMessage._emoji.name) {
+							// 			case '👍':
+							// 				upvote = voteMessage.count;
+							// 				break;
+							// 			case '👎':
+							// 				downvote = voteMessage.count;
+							// 				break;
+							// 		}
+							// 	});
+							// 	if (upvote <= downvote) {
+							// 		message.channel.send('Vote was unsuccessful. Image something better!');
+							// 		return;
+							// 	}
+								// message.channel.send('Vote was successful. Uploading to Smirkyisms.com...');
+					   //  		uploadImage(url, message.author.username, apiAddr).then( response => {
+		    		// 				console.log(response);
+								//     var embed = new MessageEmbed()
+								// 		.setColor('#0099ff')
+								// 		.addField('Submitted By', message.quoteMessage.author.username)
+								// 		.addField('Go Check it out!', 'https://smirkyisms.com/images/' + response.data.id)
+								// 		.setFooter('Smirkyisms')
+								// 		.setTimestamp();
+								// 	provokeMessage.channel.send(embed);
+					   //  		}).catch( error => {
+								// 	console.log(error);
+								// 	provokeMessage.channel.send('There was a error! ' + error);
+					   //  		})
+							// });
 						});
 					});
-				});
-			} else {
-				// Quote
-				var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n > ' + quoteMessage.content + ' \n \n Vote Now!';
-				quoteMessage.channel.send(voteMessageText).then( voteMessage => {
-					voteMessage.react('👍').then(() => voteMessage.react('👎'));
-					const filter = (reaction, user) => {
-						return ['👍', '👎'].includes(reaction.emoji.name);
-					};
+				}
+			})
 
-					const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
+			// Send Text as one Quote. If they want separate they should send the IDs separately
+			concatMessages(messages[1]).then( async concatMessage => {
+				console.log('messages');
+				console.log(concatMessage);
 
-					collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
-
-					collector.on('end', collected => {
-						console.log(`Collected ${collected} items`)
-						let upvote = 0;
-						let downvote = 0;
-						collected.each(voteMessage => {
-							switch (voteMessage._emoji.name) {
-								case '👍':
-									upvote = voteMessage.count;
-									break;
-								case '👎':
-									downvote = voteMessage.count;
-									break;
-							}
-						});
-						if (upvote <= downvote) {
-							quoteMessage.channel.send('Vote was unsuccessful. Quote something better!');
+				var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n > ' + concatMessage + ' \n \n Vote Now!';
+				messages[1][0].channel.send(voteMessageText).then( voteMessage => {
+					castVote(voteMessage).then( result => {
+						if (!result) {
+							message.channel.send('Vote was unsuccessful. Quote something better!');
 							return;
 						}
-						quoteMessage.channel.send('Vote was successful. Uploading to Smirkyisms.com...');
-						uploadQuote(quoteMessage, provokeMessage, apiAddr);
+						messages[1][0].channel.send('Vote was successful. Uploading to Smirkyisms.com...');
+						uploadQuote(
+							concatMessage,
+							messages[1][0].author.username,
+							provokeMessage.author.username,
+							messages[1][0].channel.guild.name,
+							messages[1][0].channel.name,
+							apiAddr
+						).then(response => {
+							console.log('response');
+							console.log(response);
+						    var embed = new MessageEmbed()
+								.setColor('#0099ff')
+								.addField('Quote', concatMessage)
+								.addField('Quote By', messages[1][0].author.username)
+								.addField('Submitted By', provokeMessage.author.username)
+								.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
+								.setFooter('Smirkyisms')
+								.setTimestamp();
+							provokeMessage.channel.send(embed);
+						}).catch(error => {
+							console.log(error);
+							provokeMessage.channel.send('There was a error! ' + error);
+						});
+
+					// voteMessage.react('👍').then(() => voteMessage.react('👎'));
+					// const filter = (reaction, user) => {
+					// 	return ['👍', '👎'].includes(reaction.emoji.name);
+					// };
+
+					// const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
+
+					// collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+
+					// collector.on('end', collected => {
+					// 	console.log(`Collected ${collected} items`)
+					// 	let upvote = 0;
+					// 	let downvote = 0;
+					// 	collected.each(voteMessage => {
+					// 		switch (voteMessage._emoji.name) {
+					// 			case '👍':
+					// 				upvote = voteMessage.count;
+					// 				break;
+					// 			case '👎':
+					// 				downvote = voteMessage.count;
+					// 				break;
+					// 		}
+					// 	});
+					// 	if (upvote <= downvote) {
+					// 		messages[1][0].channel.send('Vote was unsuccessful. Quote something better!');
+					// 		return;
+					// 	}
+					// 	messages[1][0].channel.send('Vote was successful. Uploading to Smirkyisms.com...');
+					// 	uploadQuote(
+					// 		concatMessage,
+					// 		messages[1][0].author.username,
+					// 		provokeMessage.author.username,
+					// 		messages[1][0].channel.guild.name,
+					// 		messages[1][0].channel.name,
+					// 		apiAddr
+					// 	).then(response => {
+					// 		console.log('response');
+					// 		console.log(response);
+					// 	    var embed = new MessageEmbed()
+					// 			.setColor('#0099ff')
+					// 			.addField('Quote', concatMessage)
+					// 			.addField('Quote By', messages[1][0].author.username)
+					// 			.addField('Submitted By', provokeMessage.author.username)
+					// 			.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
+					// 			.setFooter('Smirkyisms')
+					// 			.setTimestamp();
+					// 		provokeMessage.channel.send(embed);
+					// 	}).catch(error => {
+					// 		console.log(error);
+					// 		provokeMessage.channel.send('There was a error! ' + error);
+					// 	});
+
+
+
+
+
 					});
 				});
-			}
-
-		}).catch(function (error) {
-			console.log(error);
-			console.log('we got error')
-			message.channel.send('Message ID Not Recognized. Try Again. If you are trying images you must have one image per message!');
+			});
+		}).catch( error => {
+			console.log(error)
+			message.channel.send('A Message ID Not Recognized. Try Again!');
 		});
+
+		// return;
+
+		// sortMessages(message).then( async messageIds => {
+		// 	// Images
+		// 	console.log(messageIds[0]);
+		// 	// Quotes
+		// 	console.log(messageIds[1]);
+		// 	messageArray = new Array();
+		// 	await messageIds[1].forEach( async messageId => {
+		// 		console.log(messageId);
+		// 		console.log(await message.channel.messages.fetch(messageId).content);
+		// 		messageArray.push(await message.channel.messages.fetch(messageId).content);
+		// 	});
+		// 	console.log('single message')
+		// 	console.log(messageArray);
+		// 	// messageIds[1].forEach( messageId => {
+		// 	// 	console.log(messageId)
+		// 	// 	// Quote
+		// 	// 	message.channel.messages.fetch(messageId).then( quoteMessage => {
+
+		// 	// 		var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n > ' + quoteMessage.content + ' \n \n Vote Now!';
+		// 	// 		quoteMessage.channel.send(voteMessageText).then( voteMessage => {
+		// 	// 			voteMessage.react('👍').then(() => voteMessage.react('👎'));
+		// 	// 			const filter = (reaction, user) => {
+		// 	// 				return ['👍', '👎'].includes(reaction.emoji.name);
+		// 	// 			};
+
+		// 	// 			const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
+
+		// 	// 			collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+
+		// 	// 			collector.on('end', collected => {
+		// 	// 				console.log(`Collected ${collected} items`)
+		// 	// 				let upvote = 0;
+		// 	// 				let downvote = 0;
+		// 	// 				collected.each(voteMessage => {
+		// 	// 					switch (voteMessage._emoji.name) {
+		// 	// 						case '👍':
+		// 	// 							upvote = voteMessage.count;
+		// 	// 							break;
+		// 	// 						case '👎':
+		// 	// 							downvote = voteMessage.count;
+		// 	// 							break;
+		// 	// 					}
+		// 	// 				});
+		// 	// 				if (upvote <= downvote) {
+		// 	// 					quoteMessage.channel.send('Vote was unsuccessful. Quote something better!');
+		// 	// 					return;
+		// 	// 				}
+		// 	// 				quoteMessage.channel.send('Vote was successful. Uploading to Smirkyisms.com...');
+		// 	// 				uploadQuote(quoteMessage, provokeMessage, apiAddr);
+		// 	// 			});
+		// 	// 		});
+		// 	// 	});
+		// 	// });
+		// });
+		// // messageIds.split(' ').forEach( async messageId => {
+		// 	var quoteText = new Array();
+		// 	console.log(messageId)
+		// 	// Check if the message has a File attached.
+		// 	hasFile = await message.channel.messages.fetch(messageId).then( quoteMessage => {
+		// 		// console.log(quoteMessage.content);
+		// 		// return quoteMessage.content;
+		// 		if (quoteMessage.attachments.size > 0) {
+		// 			console.log('we have a image');
+		// 			return true
+		// 			imageMessages.push(messageId);
+
+		// 		} else {
+		// 			return false;
+		// 			quoteMessages.push(messageId);
+		// 		}
+		// 	}).catch(function (error) {
+		// 		console.log(error);
+		// 		console.log('we got error')
+		// 		message.channel.send('A Message ID Not Recognized. Try Again!');
+		// 		return;
+		// 	});
+		// 	console.log(hasFile)
+		// 	if (hasFile) {
+		// 		console.log('we have images')
+		// 	} else {
+		// 		console.log('we have NO images')
+		// 		quoteMessages.push(messageId);
+		// 	}
+		// 	// return messageText;
+		// 	// console.log(messageText)
+		// });
+
+		// imageMessages.then(function(data) {
+		// 	console.log(data);
+		// })
+		// quoteMessages.then(function(data) {
+		// 	console.log(data);
+		// })
+				// console.log('images')
+				// console.log(imageMessages);
+				// console.log('quotes')
+				// console.log(quoteMessages);
+		// var arrayLength = messages.length;
+		// for (var i = 0; i < arrayLength; i++) {
+		// 	console.log('asdasd')
+		//     console.log(messages[i]);
+		// }
+
 		return;
+
+		// messageIds.split(' ').forEach( messageId => {
+
+		// 	message.channel.messages.fetch(messageId).then( quoteMessage => {
+		// 		var imageArray = new Array();
+		// 		if (quoteMessage.attachments.size > 0) {
+		// 			quoteMessage.attachments.forEach(function(attachment) {
+		// 				if (attachIsImage(attachment.url)) {
+		// 					imageArray.push(attachment.url);
+		// 				}
+		// 			});
+		// 		}
+		// 		if (quoteMessage.attachments.size > 0 && imageArray.length > 0) {
+		// 			// Image
+		// 			imageArray.forEach(function(url) {
+		// 				var attachment = new MessageAttachment(url);
+		// 				var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n \n Vote Now!';
+		// 				quoteMessage.channel.send(voteMessageText, attachment).then( voteMessage => {
+		// 					voteMessage.react('👍').then(() => voteMessage.react('👎'));
+		// 					const filter = (reaction, user) => {
+		// 						return ['👍', '👎'].includes(reaction.emoji.name);
+		// 					};
+
+		// 					const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
+
+		// 					collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+
+		// 					collector.on('end', collected => {
+		// 						console.log(`Collected ${collected} items`)
+		// 						let upvote = 0;
+		// 						let downvote = 0;
+		// 						collected.each(voteMessage => {
+		// 							switch (voteMessage._emoji.name) {
+		// 								case '👍':
+		// 									upvote = voteMessage.count;
+		// 									break;
+		// 								case '👎':
+		// 									downvote = voteMessage.count;
+		// 									break;
+		// 							}
+		// 						});
+		// 						if (upvote <= downvote) {
+		// 							quoteMessage.channel.send('Vote was unsuccessful. Image something better!');
+		// 							return;
+		// 						}
+		// 						quoteMessage.channel.send('Vote was successful. Uploading to Smirkyisms.com...');
+		// 			    		uploadImage(url, quoteMessage, provokeMessage, apiAddr);
+		// 					});
+		// 				});
+		// 			});
+		// 		} else {
+		// 			// Quote
+		// 			var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n > ' + quoteMessage.content + ' \n \n Vote Now!';
+		// 			quoteMessage.channel.send(voteMessageText).then( voteMessage => {
+		// 				voteMessage.react('👍').then(() => voteMessage.react('👎'));
+		// 				const filter = (reaction, user) => {
+		// 					return ['👍', '👎'].includes(reaction.emoji.name);
+		// 				};
+
+		// 				const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
+
+		// 				collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+
+		// 				collector.on('end', collected => {
+		// 					console.log(`Collected ${collected} items`)
+		// 					let upvote = 0;
+		// 					let downvote = 0;
+		// 					collected.each(voteMessage => {
+		// 						switch (voteMessage._emoji.name) {
+		// 							case '👍':
+		// 								upvote = voteMessage.count;
+		// 								break;
+		// 							case '👎':
+		// 								downvote = voteMessage.count;
+		// 								break;
+		// 						}
+		// 					});
+		// 					if (upvote <= downvote) {
+		// 						quoteMessage.channel.send('Vote was unsuccessful. Quote something better!');
+		// 						return;
+		// 					}
+		// 					quoteMessage.channel.send('Vote was successful. Uploading to Smirkyisms.com...');
+		// 					uploadQuote(quoteMessage, provokeMessage, apiAddr);
+		// 				});
+		// 			});
+		// 		}
+
+		// 	}).catch(function (error) {
+		// 		console.log(error);
+		// 		console.log('we got error')
+		// 		message.channel.send('A Message ID Not Recognized. Try Again!');
+		// 	});
+		// });
+
+		// return;
 	}
 
 	// Get Random
@@ -148,9 +453,123 @@ client.on('message', message => {
 	}
 });
 
-async function uploadQuote(quoteMessage, provokeMessage, apiAddr) {
+async function getMessages(message) {
+	var messageIds = message.content.split(commandQuote + ' ')[1];
+	var imageMessages = Array();
+	var quoteMessages = Array();
+	var messageArray = messageIds.split(' ');
+	var arrayLength = messageArray.length;
+	for (var i = 0; i < arrayLength; i++) {
+		console.log(messageArray[i])
+		// Check if the message has a File attached.
+		hasFile = await message.channel.messages.fetch(messageArray[i]).then( quoteMessage => {
+			if (quoteMessage.attachments.size > 0) {
+				imageMessages.push(quoteMessage);
+			} else {
+				quoteMessages.push(quoteMessage);
+			}
+		}).catch(function (error) {
+			console.log(error);
+			throw new Error('A Message ID Not Recognized');
+		});
+		// console.log(hasFile)
+		// if (hasFile) {
+		// 	console.log('we have images')
+		// } else {
+		// 	console.log('we have NO images')
+		// 	quoteMessages.push(messageArray[i]);
+		// }
+		// return messageText;
+		// console.log(messageText)
+	}
+	return [imageMessages, quoteMessages];
+}
+
+async function concatMessages(messages) {
+	var arrayLength = messages.length;
+	var concatStr = new Array();
+	for (var i = 0; i < arrayLength; i++) {
+		// console.log(messages[i])
+		concatStr.push(messages[i].content);
+		
+	}
+	return concatStr.toString();
+}
+
+async function sortMessages(message) {
+	var messageIds = message.content.split(commandQuote + ' ')[1];
+	var imageMessages = Array();
+	var quoteMessages = Array();
+	var messageArray = messageIds.split(' ');
+	var arrayLength = messageArray.length;
+	for (var i = 0; i < arrayLength; i++) {
+		console.log(messageArray[i])
+		// Check if the message has a File attached.
+		hasFile = await message.channel.messages.fetch(messageArray[i]).then( quoteMessage => {
+			// console.log(quoteMessage.content);
+			// return quoteMessage.content;
+			if (quoteMessage.attachments.size > 0) {
+				console.log('we have a image');
+				imageMessages.push(messageArray[i]);
+
+			} else {
+				quoteMessages.push(messageArray[i]);
+			}
+		}).catch(function (error) {
+			console.log(error);
+			console.log('we got error')
+			message.channel.send('A Message ID Not Recognized. Try Again!');
+			return;
+		});
+		// console.log(hasFile)
+		// if (hasFile) {
+		// 	console.log('we have images')
+		// } else {
+		// 	console.log('we have NO images')
+		// 	quoteMessages.push(messageArray[i]);
+		// }
+		// return messageText;
+		// console.log(messageText)
+	}
+	return [imageMessages, quoteMessages];
+}
+
+async function castVote(voteMessage) {
+	voteMessage.react('👍').then(() => voteMessage.react('👎'));
+	const filter = (reaction, user) => {
+		return ['👍', '👎'].includes(reaction.emoji.name);
+	};
+
+	const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
+
+	collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+
+	collector.on('end', collected => {
+		console.log(`Collected ${collected} items`)
+		let upvote = 0;
+		let downvote = 0;
+		collected.each(voteMessage => {
+			switch (voteMessage._emoji.name) {
+				case '👍':
+					upvote = voteMessage.count;
+					break;
+				case '👎':
+					downvote = voteMessage.count;
+					break;
+			}
+		});
+		if (upvote <= downvote) {
+			// message.channel.send('Vote was unsuccessful. Image something better!');
+			return false;
+		}
+		return true;
+}
+
+
+// async function uploadQuote(quote, quoteBy, submittedBy, ServerName, ChannelName, apiAddr originalMessage, provokeMessage, apiAddr) {
+async function uploadQuote(quote, quoteBy, submittedBy, serverName, channelName, apiAddr) {
 	console.log('message');
-	console.log(provokeMessage);
+	// console.log(provokeMessage);
 	axios.post('https://smirkyisms.eu.auth0.com/oauth/token',
 		{
 			client_id: auth0ClientId,
@@ -162,12 +581,12 @@ async function uploadQuote(quoteMessage, provokeMessage, apiAddr) {
 		axios.post(
 			apiAddr + '/quote', 
 			{
-				text: quoteMessage.cleanContent,
+				text: quote,
 				type: 'discord',
-				quote_by: quoteMessage.author.username,
-				discord_submitted_by: provokeMessage.author.username,
-				discord_server_name: quoteMessage.channel.guild.name,
-				discord_channel_name: quoteMessage.channel.name,
+				quote_by: quoteBy,
+				discord_submitted_by: submittedBy,
+				discord_server_name: serverName,
+				discord_channel_name: channelName,
 				submitted_by: auth0BotUserId
 			},
 			{
@@ -176,24 +595,26 @@ async function uploadQuote(quoteMessage, provokeMessage, apiAddr) {
 		      	}
 		    }
 	    ).then(function (response) {
-			console.log(response);
-		    var embed = new MessageEmbed()
-				.setColor('#0099ff')
-				.addField('Quote', quoteMessage.content)
-				.addField('Quote By', quoteMessage.author.username)
-				.addField('Submitted By', provokeMessage.author.username)
-				.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
-				.setFooter('Smirkyisms')
-				.setTimestamp();
-			provokeMessage.channel.send(embed);
+	    	return response;
+			// console.log(response);
+		 //    var embed = new MessageEmbed()
+			// 	.setColor('#0099ff')
+			// 	.addField('Quote', quote.content)
+			// 	.addField('Quote By', quote.author.username)
+			// 	.addField('Submitted By', provokeMessage.author.username)
+			// 	.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
+			// 	.setFooter('Smirkyisms')
+			// 	.setTimestamp();
+			// provokeMessage.channel.send(embed);
 		}).catch(function (error) {
 			console.log(error);
-			provokeMessage.channel.send('There was a error! ' + error);
+			throw new Error(error);
+			// provokeMessage.channel.send('There was a error! ' + error);
 		})
 	});
 }
 
-async function uploadImage(url, quoteMessage, provokeMessage, apiAddr) {
+async function uploadImage(url, submittedBy, apiAddr) {
 	axios.post('https://smirkyisms.eu.auth0.com/oauth/token',
 		{
 			client_id: auth0ClientId,
@@ -205,7 +626,7 @@ async function uploadImage(url, quoteMessage, provokeMessage, apiAddr) {
 		var formData = new FormData();
         formData.append('type', 'discord');
         formData.append('submitted_by', 'auth0BotUserId');
-		formData.append('discord_submitted_by', quoteMessage.author.username);
+		formData.append('discord_submitted_by', submittedBy);
         await formData.append('image', request(url));
 
 
@@ -220,17 +641,20 @@ async function uploadImage(url, quoteMessage, provokeMessage, apiAddr) {
 		      	headers: headers
 	    	}
 	    ).then(function (response) {
-			console.log(response);
-		    var embed = new MessageEmbed()
-				.setColor('#0099ff')
-				.addField('Submitted By', quoteMessage.author.username)
-				.addField('Go Check it out!', 'https://smirkyisms.com/images/' + response.data.id)
-				.setFooter('Smirkyisms')
-				.setTimestamp();
-			provokeMessage.channel.send(embed);
+	    	return response;
+			// console.log(response);
+		 //    var embed = new MessageEmbed()
+			// 	.setColor('#0099ff')
+			// 	.addField('Submitted By', quoteMessage.author.username)
+			// 	.addField('Go Check it out!', 'https://smirkyisms.com/images/' + response.data.id)
+			// 	.setFooter('Smirkyisms')
+			// 	.setTimestamp();
+			// provokeMessage.channel.send(embed);
 		}).catch(function (error) {
 			console.log(error);
-			provokeMessage.channel.send('There was a error! ' + error);
+			throw new Error(error);
+			// console.log(error);
+			// provokeMessage.channel.send('There was a error! ' + error);
 		})
 	});
 }
