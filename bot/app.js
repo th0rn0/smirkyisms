@@ -192,7 +192,7 @@ client.on('message', message => {
 			.setColor('#0099ff')
 			.setTitle('Heyup ' + message.author.username + '!')
 			.setDescription('Here are the commands I know')
-			.addField(commandQuote + ' <message id here>', 'This will initiate a vote to quote something and upload to Smirkyisms.')
+			.addField(commandQuote + ' <message id here>', 'This will initiate a vote to quote something and upload to Smirkyisms. Multiple IDs will attempt to concat the messages if they are from the same person.')
 			.addField(commandRandom, 'Get random Quote or Image from Smirkyisms.')
 			.addField('\u200B', '\u200B')
 			.addField('How do I get the Message ID?', 'First you must enable developer mode on Discord and then you can right click a message and click "Copy ID". EZ PZ')
