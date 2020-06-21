@@ -59,10 +59,30 @@ client.on('message', message => {
 						var attachment = new MessageAttachment(url);
 						var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n \n Vote Now!';
 						message.channel.send(voteMessageText, attachment).then( voteMessage => {
+							voteMessage.react('👍').then(() => voteMessage.react('👎'));
+							const filter = (reaction, user) => {
+								return ['👍', '👎'].includes(reaction.emoji.name);
+							};
 
+							const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
 
-							castVote(voteMessage).then( result => {
-								if (!result) {
+							collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+
+							collector.on('end', collected => {
+								console.log(`Collected ${collected} items`)
+								let upvote = 0;
+								let downvote = 0;
+								collected.each(voteMessage => {
+									switch (voteMessage._emoji.name) {
+										case '👍':
+											upvote = voteMessage.count;
+											break;
+										case '👎':
+											downvote = voteMessage.count;
+											break;
+									}
+								});
+								if (upvote <= downvote) {
 									message.channel.send('Vote was unsuccessful. Image something better!');
 									return;
 								}
@@ -71,7 +91,7 @@ client.on('message', message => {
 		    						console.log(response);
 								    var embed = new MessageEmbed()
 										.setColor('#0099ff')
-										.addField('Submitted By', message.author.username)
+										.addField('Submitted By', message.quoteMessage.author.username)
 										.addField('Go Check it out!', 'https://smirkyisms.com/images/' + response.data.id)
 										.setFooter('Smirkyisms')
 										.setTimestamp();
@@ -79,52 +99,8 @@ client.on('message', message => {
 					    		}).catch( error => {
 									console.log(error);
 									provokeMessage.channel.send('There was a error! ' + error);
-									return;
-					    		});
-					    		return;
+					    		})
 							});
-							// voteMessage.react('👍').then(() => voteMessage.react('👎'));
-							// const filter = (reaction, user) => {
-							// 	return ['👍', '👎'].includes(reaction.emoji.name);
-							// };
-
-							// const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
-
-							// collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
-
-							// collector.on('end', collected => {
-							// 	console.log(`Collected ${collected} items`)
-							// 	let upvote = 0;
-							// 	let downvote = 0;
-							// 	collected.each(voteMessage => {
-							// 		switch (voteMessage._emoji.name) {
-							// 			case '👍':
-							// 				upvote = voteMessage.count;
-							// 				break;
-							// 			case '👎':
-							// 				downvote = voteMessage.count;
-							// 				break;
-							// 		}
-							// 	});
-							// 	if (upvote <= downvote) {
-							// 		message.channel.send('Vote was unsuccessful. Image something better!');
-							// 		return;
-							// 	}
-								// message.channel.send('Vote was successful. Uploading to Smirkyisms.com...');
-					   //  		uploadImage(url, message.author.username, apiAddr).then( response => {
-		    		// 				console.log(response);
-								//     var embed = new MessageEmbed()
-								// 		.setColor('#0099ff')
-								// 		.addField('Submitted By', message.quoteMessage.author.username)
-								// 		.addField('Go Check it out!', 'https://smirkyisms.com/images/' + response.data.id)
-								// 		.setFooter('Smirkyisms')
-								// 		.setTimestamp();
-								// 	provokeMessage.channel.send(embed);
-					   //  		}).catch( error => {
-								// 	console.log(error);
-								// 	provokeMessage.channel.send('There was a error! ' + error);
-					   //  		})
-							// });
 						});
 					});
 				}
@@ -137,12 +113,35 @@ client.on('message', message => {
 
 				var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n > ' + concatMessage + ' \n \n Vote Now!';
 				messages[1][0].channel.send(voteMessageText).then( voteMessage => {
-					castVote(voteMessage).then( result => {
-						if (!result) {
-							message.channel.send('Vote was unsuccessful. Quote something better!');
+					voteMessage.react('👍').then(() => voteMessage.react('👎'));
+					const filter = (reaction, user) => {
+						return ['👍', '👎'].includes(reaction.emoji.name);
+					};
+
+					const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
+
+					collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+
+					collector.on('end', collected => {
+						console.log(`Collected ${collected} items`)
+						let upvote = 0;
+						let downvote = 0;
+						collected.each(voteMessage => {
+							switch (voteMessage._emoji.name) {
+								case '👍':
+									upvote = voteMessage.count;
+									break;
+								case '👎':
+									downvote = voteMessage.count;
+									break;
+							}
+						});
+						if (upvote <= downvote) {
+							messages[1][0].channel.send('Vote was unsuccessful. Quote something better!');
 							return;
 						}
 						messages[1][0].channel.send('Vote was successful. Uploading to Smirkyisms.com...');
+						// uploadQuote(concatMessage, messages[1][0], provokeMessage, apiAddr);
 						uploadQuote(
 							concatMessage,
 							messages[1][0].author.username,
@@ -166,62 +165,6 @@ client.on('message', message => {
 							console.log(error);
 							provokeMessage.channel.send('There was a error! ' + error);
 						});
-
-					// voteMessage.react('👍').then(() => voteMessage.react('👎'));
-					// const filter = (reaction, user) => {
-					// 	return ['👍', '👎'].includes(reaction.emoji.name);
-					// };
-
-					// const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
-
-					// collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
-
-					// collector.on('end', collected => {
-					// 	console.log(`Collected ${collected} items`)
-					// 	let upvote = 0;
-					// 	let downvote = 0;
-					// 	collected.each(voteMessage => {
-					// 		switch (voteMessage._emoji.name) {
-					// 			case '👍':
-					// 				upvote = voteMessage.count;
-					// 				break;
-					// 			case '👎':
-					// 				downvote = voteMessage.count;
-					// 				break;
-					// 		}
-					// 	});
-					// 	if (upvote <= downvote) {
-					// 		messages[1][0].channel.send('Vote was unsuccessful. Quote something better!');
-					// 		return;
-					// 	}
-					// 	messages[1][0].channel.send('Vote was successful. Uploading to Smirkyisms.com...');
-					// 	uploadQuote(
-					// 		concatMessage,
-					// 		messages[1][0].author.username,
-					// 		provokeMessage.author.username,
-					// 		messages[1][0].channel.guild.name,
-					// 		messages[1][0].channel.name,
-					// 		apiAddr
-					// 	).then(response => {
-					// 		console.log('response');
-					// 		console.log(response);
-					// 	    var embed = new MessageEmbed()
-					// 			.setColor('#0099ff')
-					// 			.addField('Quote', concatMessage)
-					// 			.addField('Quote By', messages[1][0].author.username)
-					// 			.addField('Submitted By', provokeMessage.author.username)
-					// 			.addField('Go Check it out!', 'https://smirkyisms.com/quotes/' + response.data.id)
-					// 			.setFooter('Smirkyisms')
-					// 			.setTimestamp();
-					// 		provokeMessage.channel.send(embed);
-					// 	}).catch(error => {
-					// 		console.log(error);
-					// 		provokeMessage.channel.send('There was a error! ' + error);
-					// 	});
-
-
-
-
 
 					});
 				});
@@ -532,37 +475,6 @@ async function sortMessages(message) {
 		// console.log(messageText)
 	}
 	return [imageMessages, quoteMessages];
-}
-
-async function castVote(voteMessage) {
-	voteMessage.react('👍').then(() => voteMessage.react('👎'));
-	const filter = (reaction, user) => {
-		return ['👍', '👎'].includes(reaction.emoji.name);
-	};
-
-	const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
-
-	collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
-
-	collector.on('end', collected => {
-		console.log(`Collected ${collected} items`)
-		let upvote = 0;
-		let downvote = 0;
-		collected.each(voteMessage => {
-			switch (voteMessage._emoji.name) {
-				case '👍':
-					upvote = voteMessage.count;
-					break;
-				case '👎':
-					downvote = voteMessage.count;
-					break;
-			}
-		});
-		if (upvote <= downvote) {
-			// message.channel.send('Vote was unsuccessful. Image something better!');
-			return false;
-		}
-		return true;
 }
 
 
