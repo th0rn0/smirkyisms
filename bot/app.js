@@ -33,6 +33,14 @@ client.on('ready', () => {
 client.on('message', message => {
 	if (message.author.bot) return;
 
+	// GABBO
+ 	if (
+        message.content.toLowerCase().indexOf('gabbo') != -1 &&
+        message.content.toLowerCase().indexOf('how long') != -1
+    ) {
+        message.reply("5 DAYS");
+    }
+
 	// Quote / Image
 	if (message.content.toLowerCase().startsWith(commandQuote)) {
 
