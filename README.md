@@ -35,6 +35,5 @@ Deploy the stack using the docker-compose file in the docker directory. A Traefi
 ## Notes
 
 These files need ignoring from the build
-- auth_config.json
 - .env
 - local.js

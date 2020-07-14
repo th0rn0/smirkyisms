@@ -47,9 +47,9 @@ export default {
         let currentObj = this;
         this.loading = true;
         let formData = new FormData();
-        formData.append('image', this.image);
         formData.append('type', 'site');
         formData.append('submitted_by', this.$auth.user.sub);
+        formData.append('image', this.image);
         axios
           .post(
             window.appConfig.API_ADDR + '/image', 
