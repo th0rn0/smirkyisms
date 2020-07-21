@@ -12,6 +12,7 @@
       v-bind:submitted_by="quote.submitted_by"
       v-bind:id="quote.id"
       v-bind:user_id="quote.user_id"
+      v-bind:hyperlink="true"
     />
     <Img 
       v-if="image"
@@ -19,6 +20,15 @@
       v-bind:type="image.type"
       v-bind:submitted_by="image.submitted_by"
       v-bind:id="image.id"
+      v-bind:hyperlink="true"
+    />
+    <Video 
+      v-if="video"
+      v-bind:key="video.id"
+      v-bind:type="video.type"
+      v-bind:submitted_by="video.submitted_by"
+      v-bind:id="video.id"
+      v-bind:hyperlink="true"
     />
   </div>
 </template>
@@ -28,6 +38,7 @@
 import PageHeader from '@/components/PageHeader.vue'
 import Quote from '@/components/Quote.vue'
 import Img from '@/components/Image.vue'
+import Video from '@/components/Video.vue'
 import axios from 'axios'
 
 export default {
@@ -36,16 +47,18 @@ export default {
     PageHeader,
     Quote,
     Img,
+    Video,
   },
   data () {
     return {
       quote: null,
       image: null,
+      video: null,
       errors: [],
     }
   },
   created () {
-    var randInt = Math.floor(Math.random() * 2);
+    var randInt = Math.floor(Math.random() * 3);
     if (randInt == 1) {
       axios
         .get(window.appConfig.API_ADDR + '/image/random')
@@ -53,10 +66,17 @@ export default {
         .catch(e => {
           this.errors.push(e)
         })
-    } else {
+    } else if (randInt == 2) {
       axios
         .get(window.appConfig.API_ADDR + '/quote/random')
         .then(response => (this.quote = response.data))
+        .catch(e => {
+          this.errors.push(e)
+        })
+    } else {
+      axios
+        .get(window.appConfig.API_ADDR + '/video/random')
+        .then(response => (this.video = response.data))
         .catch(e => {
           this.errors.push(e)
         })

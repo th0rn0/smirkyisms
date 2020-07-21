@@ -48,7 +48,7 @@ module.exports = {
 	    // don't allow the total upload size to exceed ~10MB
 	    maxBytes: 10000000,
 	    maxTimeToBuffer: 10000,
-	    dirname: require('path').resolve(sails.config.custom.uploadDir)
+	    dirname: require('path').resolve(sails.config.custom.uploadDir + '/images')
   	},async function whenDone(err, uploadedFiles) {
 	    if (err) {
       	return exits.serverError(err);

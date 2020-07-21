@@ -11,6 +11,7 @@ const routes = [
     title: 'Smirkyisms',
     component: Home
   },
+  // Images
   {
     path: '/images',
     name: 'Images',
@@ -26,6 +27,7 @@ const routes = [
     title: 'Smirkyisms',
     component: () => import(/* webpackChunkName: "about" */ '../views/images/Show.vue')
   },
+  // Quotes
   {
     path: '/quotes',
     name: 'Quotes',
@@ -40,6 +42,22 @@ const routes = [
     name: 'Quote',
     title: 'Smirkyisms',
     component: () => import(/* webpackChunkName: "about" */ '../views/quotes/Show.vue')
+  },
+  // Videos
+  {
+    path: '/videos',
+    name: 'Videos',
+    title: 'Smirkyisms',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/videos/Index.vue')
+  },
+  {
+    path: '/videos/:id',
+    name: 'Video',
+    title: 'Smirkyisms',
+    component: () => import(/* webpackChunkName: "about" */ '../views/videos/Show.vue')
   },
   {
     path: '/profile',

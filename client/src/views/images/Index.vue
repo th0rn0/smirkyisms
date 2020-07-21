@@ -7,6 +7,7 @@
       v-bind:type="image.type"
       v-bind:submitted_by="image.submitted_by"
       v-bind:id="image.id"
+      v-bind:hyperlink="true"
     />
   </div>
 </template>

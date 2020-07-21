@@ -2,7 +2,7 @@ module.exports = {
 
   friendlyName: 'Random',
 
-  description: 'Get Random Quote.',
+  description: 'Get Random Quote',
 
   inputs: {
 

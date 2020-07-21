@@ -12,7 +12,7 @@ module.exports = {
     submitted_by: { type: 'string', required: true }, // ID of user submitting the Image. If bot, bot ID will be used.
     discord_submitted_by: { type: 'string', allowNull: true }, // If bot, name of the discord user Submitting the Image.
     type: { type: 'string', required: true },
-    image_path: { type: 'string', required: true }, // ID of user submitting the Quote. If bot, bot ID will be used.
+    image_path: { type: 'string', required: true },
   },
   getRandom: async function () {
     var image = await Image.count()

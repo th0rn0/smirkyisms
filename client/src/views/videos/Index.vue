@@ -1,16 +1,12 @@
 <template>
   <div class="quotes">
     <circle-spin v-if="isLoading"></circle-spin>
-    <Quote 
-      v-for="quote in quotes" 
-      v-bind:key="quote.id"
-      v-bind:type="quote.type"
-      v-bind:quote="quote.text"
-      v-bind:discord_server_name="quote.discord_server_name"
-      v-bind:discord_channel_name="quote.discord_channel_name"
-      v-bind:quote_by="quote.quote_by"
-      v-bind:submitted_by="quote.submitted_by"
-      v-bind:id="quote.id"
+    <Video 
+      v-for="video in videos" 
+      v-bind:key="video.id"
+      v-bind:type="video.type"
+      v-bind:submitted_by="video.submitted_by"
+      v-bind:id="video.id"
       v-bind:hyperlink="true"
     />
   </div>
@@ -18,13 +14,13 @@
 
 <script>
 // @ is an alias to /src
-import Quote from '@/components/Quote.vue'
+import Video from '@/components/Video.vue'
 import axios from 'axios'
 
 export default {
   name: 'Home',
   components: {
-    Quote
+    Video
   },
   methods: {
     hideLoading() {
@@ -33,16 +29,16 @@ export default {
   },
   data () {
     return {
-      quotes: null,
+      videos: null,
       isLoading: false
     }
   },
   created () {
     this.isLoading = true;
     axios
-      .get(window.appConfig.API_ADDR + '/quote?sort=createdAt%20DESC')
+      .get(window.appConfig.API_ADDR + '/video?sort=createdAt%20DESC')
       .then(response => {
-        this.quotes = response.data;
+        this.videos = response.data;
         this.isLoading = false;
       })
       .catch(e => {

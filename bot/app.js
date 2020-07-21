@@ -53,11 +53,17 @@ client.on('message', message => {
 			// Send each Image individually
 			messages[0].forEach( message => {
 				var imageArray = new Array();
-				// Only get Images
+				var videoArray = new Array();
+				// Only get Images & Videos
 				if (message.attachments.size > 0) {
 					message.attachments.forEach(function(attachment) {
 						if (attachIsImage(attachment.url)) {
 							imageArray.push(attachment.url);
+						}
+					});
+					message.attachments.forEach(function(attachment) {
+						if (attachIsVideo(attachment.url)) {
+							videoArray.push(attachment.url);
 						}
 					});
 				}
@@ -101,6 +107,58 @@ client.on('message', message => {
 										.setColor('#0099ff')
 										.addField('Submitted By', message.author.username)
 										.addField('Go Check it out!', 'https://smirkyisms.com/images/' + response.data.id)
+										.setFooter('Smirkyisms')
+										.setTimestamp();
+									provokeMessage.channel.send(embed);
+					    		}).catch( error => {
+									console.log(error);
+									provokeMessage.channel.send('There was a error! ' + error);
+					    		})
+							});
+						});
+					});
+				}
+
+				if (message.attachments.size > 0 && videoArray.length > 0) {
+					// Video
+					videoArray.forEach(function(url) {
+						var attachment = new MessageAttachment(url);
+						var voteMessageText = '\n Fair Sik... Starting a 30 Second Vote... \n \n Vote Now!';
+						message.channel.send(voteMessageText, attachment).then( voteMessage => {
+							voteMessage.react('👍').then(() => voteMessage.react('👎'));
+							const filter = (reaction, user) => {
+								return ['👍', '👎'].includes(reaction.emoji.name);
+							};
+
+							const collector = voteMessage.createReactionCollector(filter, { max: 10, time: voteTime, errors: ['time'] });
+
+							collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+
+							collector.on('end', collected => {
+								console.log(`Collected ${collected} items`)
+								let upvote = 0;
+								let downvote = 0;
+								collected.each(voteMessage => {
+									switch (voteMessage._emoji.name) {
+										case '👍':
+											upvote = voteMessage.count;
+											break;
+										case '👎':
+											downvote = voteMessage.count;
+											break;
+									}
+								});
+								if (upvote <= downvote) {
+									message.channel.send('Vote was unsuccessful. Video something better!');
+									return;
+								}
+								message.channel.send('Vote was successful. Uploading to Smirkyisms.com...');
+					    		uploadVideo(url, message.author.username, apiAddr).then( response => {
+		    						console.log(response);
+								    var embed = new MessageEmbed()
+										.setColor('#0099ff')
+										.addField('Submitted By', message.author.username)
+										.addField('Go Check it out!', 'https://smirkyisms.com/videos/' + response.data.id)
 										.setFooter('Smirkyisms')
 										.setTimestamp();
 									provokeMessage.channel.send(embed);
@@ -313,13 +371,52 @@ async function uploadImage(url, submittedBy, apiAddr) {
 	});
 }
 
+async function uploadVideo(url, submittedBy, apiAddr) {
+	return axios.post('https://smirkyisms.eu.auth0.com/oauth/token',
+		{
+			client_id: auth0ClientId,
+			client_secret: auth0ClientSecret,
+			audience: auth0Audience,
+			grant_type: "client_credentials"
+		}
+	).then(async function (auth) {
+		var formData = new FormData();
+        formData.append('type', 'discord');
+        formData.append('submitted_by', 'auth0BotUserId');
+		formData.append('discord_submitted_by', submittedBy);
+        await formData.append('video', request(url));
+
+
+        const headers = Object.assign({
+		    'Authorization': `Bearer ${auth.data.access_token}`,
+		}, formData.getHeaders());
+
+		return axios.post(
+			apiAddr + '/video', 
+			formData,
+			{
+		      	headers: headers
+	    	}
+	    ).then(function (response) {
+	    	return response;
+		}).catch(function (error) {
+			console.log(error);
+			throw new Error(error);
+		})
+	});
+}
+
 function attachIsImage(url) {
     return(url.match(/\.(jpeg|jpg|gif|png)$/) != null);
 }
 
+function attachIsVideo(url) {
+    return(url.match(/\.(mp4|m4v|avi|mpg)$/) != null);
+}
+
 async function getRandom(message, apiAddr) {
 	var attachment = null;
-	var randInt = Math.floor(Math.random() * 2);
+	var randInt = Math.floor(Math.random() * 3);
     if (randInt == 1) {
 		axios.get(apiAddr + '/image/random')
 		.then(function (response) {
@@ -344,7 +441,7 @@ async function getRandom(message, apiAddr) {
 				message.channel.send('Sorry there was a error. Try again. ' + error);
 			});
 		});
-	} else {
+	} else if (randInt == 2) {
 		axios.get(apiAddr + '/quote/random')
 		.then(function (response) {
 			console.log(response);
@@ -376,6 +473,38 @@ async function getRandom(message, apiAddr) {
 			message.channel.send(embed);
 		}).catch(function (error) {
 			message.channel.send('Sorry there was a error. Try again. ' + error);
+		});
+	} else {
+		axios.get(apiAddr + '/video/random')
+		.then(function (response) {
+			axios.get(apiAddr + '/video/' + response.data.id + '/file')
+			.then(function (fileRes) {
+				console.log(response);
+				if (response.data.type == 'site') {
+					var embed = new MessageEmbed()
+						.setColor('#0099ff')
+						.addField('Submitted By', response.data.submitted_by)
+						.addField('Go Check it out!', 'https://smirkyisms.com/videos/' + response.data.id)
+						.setFooter('Smirkyisms')
+						.setTimestamp();
+				} else if (response.data.type == 'discord') {
+					var embed = new MessageEmbed()
+						.setColor('#0099ff')
+						.addField('Submitted By', response.data.discord_submitted_by)
+						.addField('Go Check it out!', 'https://smirkyisms.com/videos/' + response.data.id)
+						.setFooter('Smirkyisms')
+						.setTimestamp();	
+				} else {
+					var embed = new MessageEmbed()
+						.setColor('#0099ff')
+						.addField('Video', "Type not supported. Bug Th0rn0")
+						.setFooter('Smirkyisms')
+						.setTimestamp();	
+				}
+				message.channel.send(embed);
+			}).catch(function (error) {
+				message.channel.send('Sorry there was a error. Try again. ' + error);
+			});
 		});
 	}
 }

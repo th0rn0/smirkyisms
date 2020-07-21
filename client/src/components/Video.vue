@@ -1,7 +1,13 @@
 <template>
 	<div class="card mb-3">
     <div class="card-body" style="transform: rotate(0);">
-			<img :src="'data:image/jpg;base64,' + image" class="img-fluid">
+			<!-- <img :src="'data:image/jpg;base64,' + image" class="img-fluid"> -->
+      <div class="embed-responsive embed-responsive-16by9">
+        <video class="embed-responsive-item" controls="controls" preload="none" :poster="'data:image/jpg;base64,' + thumbnail" :src="'data:video/mp4;base64,' + video">
+          Your browser does not support the HTML5 Video element.
+        </video>
+      </div>
+      <!-- <embed type="video/mp4" :src="'data:video/mp4;base64,' + video"> -->
       <blockquote class="blockquote text-right mb-0">
         <footer class="blockquote-footer">
           posted by {{ submitted_by }}
@@ -12,12 +18,12 @@
             </span>
           </span>
         </footer>
-        <a v-if="id && hyperlink" class="stretched-link" :href="'/images/' + id"></a>
+        <a v-if="id && hyperlink" class="stretched-link" :href="'/videos/' + id"></a>
       </blockquote>
     </div>
     <div v-if="id" class="card-footer text-right text-muted">
-       <social-sharing :url="'https://smirkyisms.com/images/' + id"
-                            title="Check Out this Dumb Shit Pic!"
+       <social-sharing :url="'https://smirkyisms.com/videos/' + id"
+                            title="Check Out this Dumb Shit Video!"
                             hashtags="smirkyisms,wot,why"
                             inline-template>
         <div>
@@ -38,7 +44,7 @@
 import axios from 'axios'
 
 export default {
-  name: 'showImage',
+  name: 'showVideo',
   props: {
     type: String,
 		discord_server_name: String,
@@ -52,18 +58,27 @@ export default {
   },
 	data () {
     return {
-      image: null,
+      video: null,
+      thumbnail: null,
     }
   },
   created () {
     axios
-      .get(window.appConfig.API_ADDR + '/image/' + this.id + '/file')
+      .get(window.appConfig.API_ADDR + '/video/' + this.id + '/file')
       .then(response => {
-        this.image = response.data
+        this.video = response.data
       })
       .catch(e => {
 				this.errors.push(e)
 			})
+    axios
+      .get(window.appConfig.API_ADDR + '/video/' + this.id + '/thumbnail')
+      .then(response => {
+        this.thumbnail = response.data
+      })
+      .catch(e => {
+        this.errors.push(e)
+      })
   }
 }
 </script>

@@ -6,8 +6,10 @@
         <router-link to="/">Random</router-link> |
         <router-link to="/quotes">Quotes</router-link> |
         <router-link to="/images">Images</router-link> |
+        <router-link to="/videos">Videos</router-link> |
         <a v-if="$auth.isAuthenticated" href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddQuote">Add Quote</a><span v-if="$auth.isAuthenticated"> | </span> 
         <a v-if="$auth.isAuthenticated" href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddImage">Add Image</a><span v-if="$auth.isAuthenticated"> | </span> 
+        <a v-if="$auth.isAuthenticated" href="#" class="router-link-active" data-toggle="modal" data-target="#modalAddVideo">Add Video</a><span v-if="$auth.isAuthenticated"> | </span> 
         <!-- Check that the SDK client is not currently loading before accessing is methods -->
         <router-link v-if="$auth.isAuthenticated" to="/profile">Profile</router-link><span v-if="$auth.isAuthenticated"> | </span> 
         <a v-if="$auth.isAuthenticated" @click="logout" class="button is-dark">Log out</a>
@@ -19,6 +21,7 @@
     </main>
     <QuoteModal />
     <ImageModal />
+    <VideoModal />
   </div>
 </template>
 
@@ -26,12 +29,13 @@
 
 import QuoteModal from '@/components/QuoteModal.vue'
 import ImageModal from '@/components/ImageModal.vue'
-
+import VideoModal from '@/components/VideoModal.vue'
 
 export default {
   components: {
     QuoteModal,
-    ImageModal
+    ImageModal,
+    VideoModal
   },
   data() {
     return {

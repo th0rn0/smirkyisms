@@ -20,6 +20,7 @@ module.exports.routes = {
   ***************************************************************************/
 
   'POST /image': { action: 'image/upload' },
+  'POST /video': { action: 'video/upload' },
   'GET /quote/random': { action: 'quote/random' },
   'GET /quote': { action: 'quote/index' },
   'GET /quote/:quoteId': { action: 'quote/show' },
@@ -27,6 +28,12 @@ module.exports.routes = {
   'GET /image': { action: 'image/index' },
   'GET /image/:imageId': { action: 'image/show' },
   'GET /image/:imageId/file': { action: 'image/file' },
+  'GET /video': { action: 'video/index' },
+  'GET /video/:videoId': { action: 'video/show' },
+  'GET /video/random': { action: 'video/random' },
+  'GET /video/:videoId/file': { action: 'video/file' },
+  'GET /video/:videoId/thumbnail': { action: 'video/thumbnail' },
+
   // 'GET /users': { action: 'user/index' },
 
 

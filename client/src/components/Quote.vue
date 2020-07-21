@@ -12,7 +12,7 @@
             </span>
           </span>
         </footer>
-        <a v-if="id" class="stretched-link" :href="'/quotes/' + id"></a>
+        <a v-if="id && hyperlink" class="stretched-link" :href="'/quotes/' + id"></a>
       </blockquote>
     </div>
     <div v-if="id" class="card-footer text-right text-muted">
@@ -46,6 +46,7 @@ export default {
     discord_server_name: String,
     discord_channel_name: String,
     id: String,
+    hyperlink: Boolean
   },
   methods: {
    
