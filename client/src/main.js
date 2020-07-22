@@ -14,8 +14,8 @@ import "bootswatch/dist/flatly/bootstrap.min.css";
 // Configs
 // Defaults
 Vue.config.productionTip = false
-window.appConfig = { API_ADDR: "http://localhost:1337" }
-// window.appConfig = { API_ADDR: "https://api.smirkyisms.com" }
+// window.appConfig = { API_ADDR: "http://localhost:1337" }
+window.appConfig = { API_ADDR: "https://api.smirkyisms.com" }
 
 
 import { domain, clientId, audience } from "../auth_config.json";
