@@ -26,7 +26,6 @@ module.exports = {
      	user = await sails.helpers.getUser(inputs.video.submitted_by);
       name = user.username;
     }
-    console.log(name);
     inputs.video.submitted_by = name;
 
     return inputs.video;

@@ -32,6 +32,10 @@ module.exports = {
     	description: 'No file was attached.',
     	responseType: 'badRequest'
     },
+    badFileType: {
+      description: 'File Type Not Allowed.',
+      responseType: 'badRequest'
+    },
     serverError: {
     	description: `Failed to upload the file`,
     	responseType: 'serverError',
@@ -40,9 +44,10 @@ module.exports = {
 
 	files: ['video'],
 
-	fn: function (inputs, exits) {
-    console.log('we here - video');
-    console.log(inputs);
+	fn: async function (inputs, exits) {
+    const FileType = require('file-type');
+    const allowedFileTypes = ['mp4','m4v','avi','mpg'];
+    const fs = require('fs');
   	inputs.video.upload({
 			noop: false,
 	    // don't allow the total upload size to exceed ~10MB
@@ -50,21 +55,24 @@ module.exports = {
 	    maxTimeToBuffer: 10000,
 	    dirname: require('path').resolve(sails.config.custom.uploadDir + '/videos')
   	},async function whenDone(err, uploadedFiles) {
-      
-      const ThumbnailGenerator = require('video-thumbnail-generator').default;
-
+      // Handle Errors
 	    if (err) {
       	return exits.serverError(err);
 	    }
-
 	    // If no files were uploaded, respond with an error.
 	    if (uploadedFiles.length === 0){
       	console.log('No file was uploaded');
 	    	return exits.noFileAttached('no files');
 	    }
-      // var fielName = uploadedFiles[0].fd.replace(sails.config.custom.uploadDir + '/videos', '');
-      console.log(uploadedFiles);
+      // Validate Video
+      var videoMeta = await FileType.fromFile(uploadedFiles[0].fd);
+      if (!allowedFileTypes.includes(videoMeta['ext'])) {
+        await fs.unlinkSync(uploadedFiles[0].fd);
+        return exits.badFileType();
+      }
+
       // Create thumbnail
+      const ThumbnailGenerator = require('video-thumbnail-generator').default;
       const tg = new ThumbnailGenerator({
         sourcePath: uploadedFiles[0].fd,
         thumbnailPath: sails.config.custom.uploadDir + '/videos/thumbnail',

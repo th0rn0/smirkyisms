@@ -32,6 +32,10 @@ module.exports = {
     	description: 'No file was attached.',
     	responseType: 'badRequest'
     },
+    badFileType: {
+      description: 'File Type Not Allowed.',
+      responseType: 'badRequest'
+    },
     serverError: {
     	description: `Failed to upload the file`,
     	responseType: 'serverError',
@@ -41,8 +45,9 @@ module.exports = {
 	files: ['image'],
 
 	fn: function (inputs, exits) {
-    console.log('we here');
-    console.log(inputs);
+    const FileType = require('file-type');
+    const allowedFileTypes = ['jpeg','jpg','gif','png'];
+    const fs = require('fs');
   	inputs.image.upload({
 			noop: false,
 	    // don't allow the total upload size to exceed ~10MB
@@ -50,15 +55,21 @@ module.exports = {
 	    maxTimeToBuffer: 10000,
 	    dirname: require('path').resolve(sails.config.custom.uploadDir + '/images')
   	},async function whenDone(err, uploadedFiles) {
+      // Handle Errors
 	    if (err) {
       	return exits.serverError(err);
 	    }
-
 	    // If no files were uploaded, respond with an error.
 	    if (uploadedFiles.length === 0){
       	console.log('No file was uploaded');
 	    	return exits.noFileAttached('no files');
 	    }
+      // Validate Video
+      var imageMeta = await FileType.fromFile(uploadedFiles[0].fd);
+      if (!allowedFileTypes.includes(imageMeta['ext'])) {
+        await fs.unlinkSync(uploadedFiles[0].fd);
+        return exits.badFileType();
+      }
 
 	    var image = await Image.create({
 	    	submitted_by: inputs.submitted_by,

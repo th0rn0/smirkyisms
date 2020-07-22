@@ -10,6 +10,7 @@
     "@sailshq/socket.io-redis": "^5.2.0",
     "auth0": "^2.24.0",
     "express-jwt": "^5.3.3",
+    "file-type": "^14.6.2",
     "grunt": "1.0.4",
     "jwks-rsa": "^1.7.0",
     "sails": "^1.2.3",

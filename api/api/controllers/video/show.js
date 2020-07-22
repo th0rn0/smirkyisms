@@ -39,7 +39,6 @@ module.exports = {
     if (!video) {
     	return exits.notFound();
     }
-    console.log('asdasd');
     sails.helpers.formatVideoInfo(video).then(video => {
     	return exits.success(video);
     });
