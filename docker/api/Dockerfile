@@ -1,8 +1,10 @@
-FROM node:13
+FROM node:13-alpine
 
 WORKDIR /usr/src/app
 
 COPY api /usr/src/app
+
+RUN apk add ffmpeg
 
 RUN npm install pm2 -g
 
