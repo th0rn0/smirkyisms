@@ -39,7 +39,23 @@ client.on('message', message => {
         message.content.toLowerCase().indexOf('how long') != -1
     ) {
         message.reply("5 DAYS");
+	}
+	
+	// Party people
+	if (
+		message.content.toLowerCase().indexOf('snort') != -1 &&
+        message.content.toLowerCase().indexOf('condom') != -1
+    ) {
+        message.reply("When's the party starting?");
     }
+
+    // Sausage
+    if (
+    	message.content.toLowerCase().indexOf('sausage') != -1 &&
+    	message.content.toLowerCase().indexOf('chips') != -1
+	) {
+    	message.reply("You are shit. You're opinion is wrong. Who the FUCK goes to a Fish & Chip Shop for Sausage and Chips.");
+	}
 
 	// Quote / Image
 	if (message.content.toLowerCase().startsWith(commandQuote)) {
@@ -416,8 +432,26 @@ function attachIsVideo(url) {
 
 async function getRandom(message, apiAddr) {
 	var attachment = null;
-	var randInt = Math.floor(Math.random() * 3);
-    if (randInt == 1) {
+
+	var type;
+
+	if (message.content.toLowerCase().indexOf('video') != -1) {
+		type = 0;
+	}
+
+	if (message.content.toLowerCase().indexOf('image') != -1) {
+		type = 1;
+	}
+
+	if (message.content.toLowerCase().indexOf('quote') != -1) {
+		type = 2;
+	}
+
+	if (type == null) {
+		type = Math.floor(Math.random() * 3);
+	}
+	
+    if (type == 1) {
 		axios.get(apiAddr + '/image/random')
 		.then(function (response) {
 			axios.get(apiAddr + '/image/' + response.data.id + '/file')
@@ -441,7 +475,7 @@ async function getRandom(message, apiAddr) {
 				message.channel.send('Sorry there was a error. Try again. ' + error);
 			});
 		});
-	} else if (randInt == 2) {
+	} else if (type == 2) {
 		axios.get(apiAddr + '/quote/random')
 		.then(function (response) {
 			console.log(response);
@@ -474,7 +508,7 @@ async function getRandom(message, apiAddr) {
 		}).catch(function (error) {
 			message.channel.send('Sorry there was a error. Try again. ' + error);
 		});
-	} else {
+	} else if (type == 0) {
 		axios.get(apiAddr + '/video/random')
 		.then(function (response) {
 			axios.get(apiAddr + '/video/' + response.data.id + '/file')
