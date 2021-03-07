@@ -1,5 +1,7 @@
 # Smirkyisms Quote Book
 
+The V1, Proof of concept for the Smirkyisms site. Not representative of what is currently running on Smirkyisms.
+
 A little Project I put together to learn some more Java, NodeJS, VueJS, Backend & Frontend Servers. The bot just came along for the ride.
 
 Fully Dockerized and utilizing PM2 where applicable. 
